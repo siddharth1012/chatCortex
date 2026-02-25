@@ -1,143 +1,199 @@
 # ChatCortex
 
-ChatCortex is a **privacy-first, local document chatbot engine** designed to be embedded into any application.  
-It enables teams to build document-aware conversational systems **without relying on cloud services**, while keeping all data within their own infrastructure.
+**ChatCortex** is a research-oriented framework for automated synthesis
+and multi-objective optimization of LLM-based agent architectures.
 
-ChatCortex is **library-first**, **API-agnostic**, and designed for production and enterprise use cases.
+It is designed as a controlled experimental platform for modeling,
+generating, evaluating, and optimizing tool-augmented AI agent systems.
 
----
+------------------------------------------------------------------------
 
-## Overview
+## Vision
 
-Most document-based chat systems are tightly coupled to user interfaces, depend on external cloud services, or are difficult to integrate into existing platforms.
+ChatCortex aims to eliminate manual agent wiring and ad-hoc prompt
+engineering by introducing:
 
-ChatCortex focuses exclusively on the **core infrastructure layer**, allowing developers to integrate document chat capabilities into their own systems with minimal overhead.
+-   Formal task modeling
+-   Constraint-aware synthesis
+-   Multi-objective optimization
+-   Exact Pareto frontier computation
+-   Deterministic and stochastic execution simulation
 
----
+Long-term goal:
 
-## Core Principles
+Automated architecture synthesis of reliable AI agents from high-level
+intent.
 
-- **Privacy-first**: All ingestion, retrieval, and inference occur locally  
-- **Library-first design**: Use directly as a Python SDK or wrap with custom APIs  
-- **Frontend-agnostic**: Compatible with any UI or client application  
-- **Backend-oriented**: Built as infrastructure, not a demo application  
-- **Simple and stable API**: Small public surface area intended for long-term stability  
+------------------------------------------------------------------------
 
----
+## Architecture Overview
 
-## Use Cases
+ChatCortex is organized into layered research components:
 
-ChatCortex can be used to build:
+1. **User / Intent Layer** (future)
+2. **TaskSpecification** (formal model)
+3. **Synthesis Engine** (greedy / exhaustive)
+4. **AgentGraph** (DAG representation)
+5. **Execution Engine** (deterministic / probabilistic)
+6. **Telemetry**
+7. **Evaluation Harness**
+8. **Pareto Optimization**
 
-- Internal enterprise document chatbots  
-- Knowledge base assistants  
-- Policy, HR, and legal document Q&A systems  
-- On-premise or air-gapped AI assistants  
-- Custom chat APIs for proprietary frontends  
+------------------------------------------------------------------------
 
----
+# Core Components
 
-## Quick Start
+## 1️. Component Metadata
 
-```bash
+Formal, immutable representation of:
+
+-   Models
+-   Tools
+-   Memory modules
+-   Verification modules
+
+Each component defines:
+
+-   Capabilities
+-   Cost
+-   Latency
+-   Reliability
+-   Privacy level
+
+------------------------------------------------------------------------
+
+## 2️. TaskSpecification
+
+Defines a task formally:
+
+-   Ordered required capabilities
+-   Hard constraints (max cost, latency, privacy)
+-   Multi-objective weights
+
+Separates feasibility from optimization preference.
+
+------------------------------------------------------------------------
+
+## 3️. Synthesizers
+
+### HeuristicSynthesizer
+
+Greedy deterministic builder selecting best component per stage.
+
+### ExhaustiveSynthesizer
+
+Explores full Cartesian architecture space and enables exact Pareto
+frontier computation.
+
+------------------------------------------------------------------------
+
+## 4️. AgentGraph
+
+Directed Acyclic Graph (DAG) representation of agent architecture.
+
+Aggregates:
+
+-   Total cost (additive)
+-   Total latency (sequential assumption)
+-   Aggregate reliability (multiplicative)
+
+------------------------------------------------------------------------
+
+## 5️. Execution Engine
+
+Supports:
+
+-   Deterministic mode (structural validation)
+-   Probabilistic mode (reliability simulation)
+-   Fixed random seed for reproducibility
+
+------------------------------------------------------------------------
+
+## 6️. Evaluation Harness
+
+Runs experiments across:
+
+-   Multiple tasks
+-   Multiple synthesizers
+-   Multiple stochastic trials
+
+Produces:
+
+-   Average cost
+-   Average latency
+-   Success rate
+
+------------------------------------------------------------------------
+
+## 7️. Pareto Optimization
+
+Exact multi-objective Pareto frontier computation across:
+
+-   Cost (minimize)
+-   Latency (minimize)
+-   Reliability (maximize)
+
+Provides ground-truth optimal architecture trade-offs.
+
+------------------------------------------------------------------------
+
+# Research Positioning
+
+ChatCortex is intended as:
+
+-   A systems-AI research framework
+-   A controlled environment for architecture optimization experiments
+
+It emphasizes:
+
+-   Reproducibility
+-   Formal modeling
+-   Separation of concerns
+-   Experimental rigor
+
+------------------------------------------------------------------------
+
+# Roadmap
+
+### Phase 1 (Complete)
+
+-   Formal modeling
+-   Heuristic synthesis
+-   Execution simulation
+-   Evaluation harness
+
+### Phase 2 (Complete)
+
+-   Exhaustive architecture search
+-   Exact 3-objective Pareto optimization
+
+### Phase 3 (Planned)
+
+-   Heuristic search (beam search, evolutionary refinement)
+-   Statistical robustness analysis
+-   Intent-to-task automation layer
+-   Real model/tool integration
+
+------------------------------------------------------------------------
+
+# Installation
+
 pip install chatcortex
 
-from chatcortex import ChatCortexEngine
+------------------------------------------------------------------------
 
-engine = ChatCortexEngine()
+# Status
 
-# Ingest documents (v0.1 supports .txt files)
-engine.ingest("./docs")
+ChatCortex is currently a research framework under active development.
 
-# Ask a question
-response = engine.chat("What is covered in these documents?")
-print(response)
-```
---- 
+It is not yet a production agent orchestration library.
 
-## Public API (v0.1)
+------------------------------------------------------------------------
 
-```
-ChatCortexEngine(
-    config: ChatCortexConfig | None = None
-)
-
-engine.ingest(source: str)
-engine.chat(message: str, session_id: Optional[str] = None) -> str
-engine.reset_session(session_id: str)
-```
----
-
-## Configuration
-
-```
-from chatcortex.config import ChatCortexConfig
-from chatcortex import ChatCortexEngine
-
-config = ChatCortexConfig(
-    chunk_size=500,
-    chunk_overlap=100
-)
-
-engine = ChatCortexEngine(config)
-```
-
----
-
-## Design Philosophy
-
-ChatCortex enforces a clear separation of responsibilities:
-
-| Layer       | Responsibility                                    |
-| ----------- | ------------------------------------------------- |
-| Core Engine | Document ingestion, retrieval, session management |
-| API Layer   | Optional adapters (REST, gRPC, etc.)              |
-| Frontend    | Fully owned by the integrator                     |
-
-
-You are free to:
-
-Use ChatCortex directly as a Python library
-
-Wrap it with your own API layer
-
-Integrate it into existing systems
-
-Ignore any optional adapters
-
----
-
-## Roadmap
-v0.1 -> Core engine -> Local document ingestion -> Session handling
-
-## Planned
-
-PDF ingestion -> Embeddings and vector database support (FAISS, Chroma) -> Streaming responses -> External connectors (S3, SharePoint) -> Optional FastAPI service wrapper
-
----
-
-## Development Setup
-```
-git clone https://github.com/yourusername/chatcortex
-cd chatcortex
-python -m venv .venv
-source .venv/bin/activate
-pip install -e .
-```
-
----
-
-## License
+# License
 
 MIT License
 
-You are free to use, modify, and integrate ChatCortex into commercial and internal products.
+------------------------------------------------------------------------
 
----
-
-## Project Goals
-
-ChatCortex is built as infrastructure, not a demo application.
-
-It is intended for teams that require a reusable, local-first document chatbot engine
-without repeatedly rebuilding the same backend components.
+Developed by Siddharth Saraswat

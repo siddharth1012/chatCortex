@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chatcortex"
-version = "0.1.0"
-description = "A privacy-first, local document chatbot engine"
+version = "0.2.0"
+description = "Experimental platform for automated synthesis and evaluation of LLM-based agent systems"
 authors = [{ name = "Siddharth Saraswat" }]
 readme = "README.md"
 requires-python = ">=3.9"
