@@ -31,6 +31,31 @@ class AgentGraph:
             self._graph.remove_edge(from_node, to_node)
             raise ValueError("Edge creates cucle. AgentGraph must remain acyclic")
     
+    def copy(self) -> "AgentGraph":
+        """
+        Deep copy of the AgentGraph
+
+        Copies:
+            - All nodes
+            - associated metadata
+            - all edges
+
+        Preserves DAG structure
+        """
+
+        new_graph = AgentGraph()
+
+        # Copy nodes with metadata
+        for node_id, data in self._graph.nodes(data=True):
+            metadata = data["metadata"]
+            new_graph.add_component(node_id, metadata)
+
+        # Copy edges
+        for source, target in self._graph.edges():
+            new_graph.add_edge(source, target)
+        
+        return new_graph
+
     # Validation
 
     def validate(self) -> bool:

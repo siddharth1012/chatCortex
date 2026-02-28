@@ -1,30 +1,27 @@
-from itertools import product
-from typing import List, Optional
+import random
+from typing import List
 
-from chatcortex.optimization.architecture_candidate import ArchitectureCandidate
 from chatcortex.graph.agent_graph import AgentGraph
+from chatcortex.optimization.architecture_candidate import ArchitectureCandidate
 from chatcortex.optimization.pareto import ParetoSet
-from chatcortex.registry.capability_registry import CapabilityRegistry
 from chatcortex.synthesis.base import Synthesizer
 from chatcortex.synthesis.budget import BudgetExceeded, SynthesisBudget, SynthesisContext
 from chatcortex.synthesis.task_specification import TaskSpecification
 
 
-class ExhaustiveSynthesizer(Synthesizer):
+class RandomSynthesizer(Synthesizer):
     """
-    Generate all feasible architectures via Cartesian product
-    of candidate components per capability
+    Random architecture sampling synthesizer
 
-    v0.3.0: 
-        - Budget-aware
-        - Incremental Pareto maintenance
-        - Memory-efficient (no full cartesian materialization)
+    v0.3.0 baseline strategy
+        - Uniformly samples architectures under evaluation budget
+        - maintains incremental Pareto frontier
     """
-    
+
     def synthesize(
         self, 
-        task: TaskSpecification,
-        budget: Optional[SynthesisBudget] = None,
+        task: TaskSpecification, 
+        budget: SynthesisBudget = None
     ) -> List[ArchitectureCandidate]:
 
         task.validate()
@@ -32,8 +29,9 @@ class ExhaustiveSynthesizer(Synthesizer):
         context = SynthesisContext(budget)
         pareto_set = ParetoSet()
 
-        # Step 1: Collect candidates per capability
-        candidate_lists = []
+        random_number_generation = random.Random(budget.random_seed if budget else None)
+
+        candidates_list = []
 
         for capability in task.required_capabilities:
             candidates = self.registry.get_by_capability(
@@ -42,17 +40,20 @@ class ExhaustiveSynthesizer(Synthesizer):
             )
 
             if not candidates:
-                return [] 
+                return []
 
-            candidate_lists.append(candidates)
+            candidates_list.append(candidates)
+
         
-        # Step 2: Cartesian Product (lazy iteration)
-        for combination in product(*candidate_lists):
+        while True:
 
             graph = AgentGraph()
             previous_node = None
 
-            for idx, component in enumerate(combination):
+            # Randomly select one component per capability
+
+            for idx, candidates in enumerate(candidates_list):
+                component = random_number_generation.choice(candidates) 
                 node_id = f"{component.name}_{idx}"
                 graph.add_component(node_id, component)
 
@@ -66,7 +67,6 @@ class ExhaustiveSynthesizer(Synthesizer):
             except BudgetExceeded:
                 break
             
-            # Hard constraints check
             total_cost = graph.total_cost()
             total_latency = graph.total_latency()
             total_reliability = graph.aggregate_reliability()
@@ -77,15 +77,13 @@ class ExhaustiveSynthesizer(Synthesizer):
             if task.max_latency is not None and total_latency > task.max_latency:
                 continue
 
-            
             candidate = ArchitectureCandidate(
                 graph=graph,
                 total_cost=total_cost,
                 total_latency=total_latency,
                 total_reliability=total_reliability,
-            )
-            
-            # Incremental Pareto insertion
-            pareto_set.add(candidate)
-        
+            )        
+
+            pareto_set.add(candidate=candidate)
+                
         return list(pareto_set)
