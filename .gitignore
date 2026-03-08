@@ -1,11 +1,30 @@
-# virtual env
-venv
-
-# Python cache
+# Python
 __pycache__/
-*.pyc 
+*.py[cod]
+*.pyo
+*.pyd
+*.so
 
-# Build Artifacts
-dist/
+# Packaging
 build/
-*.egg-info
+dist/
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Testing
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
