@@ -314,3 +314,18 @@ def run_budget_sweep(registry, task):
             )
 
     return results
+
+
+if __name__ == "__main__":
+    from chatcortex import TaskSpecification, build_demo_registry
+
+    capabilities = (
+        "retrieval",
+        "generation",
+        "verification",
+        "refinement",
+        "postprocessing",
+    )
+    registry = build_demo_registry(capabilities=capabilities)
+    task = TaskSpecification(required_capabilities=list(capabilities))
+    run_budget_sweep(registry, task)
