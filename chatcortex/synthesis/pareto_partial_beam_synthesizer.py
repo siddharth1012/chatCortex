@@ -1,9 +1,8 @@
-from typing import List, Tuple
+from typing import List
 
 from chatcortex.graph.agent_graph import AgentGraph
 from chatcortex.optimization.architecture_candidate import ArchitectureCandidate
 from chatcortex.optimization.pareto import ParetoSet
-from chatcortex.registry.metadata import ComponentMetadata
 from chatcortex.synthesis.base import Synthesizer
 from chatcortex.synthesis.budget import BudgetExceeded, SynthesisBudget, SynthesisContext
 from chatcortex.synthesis.task_specification import TaskSpecification
@@ -18,7 +17,7 @@ class ParetoPartialBeamSynthesizer(Synthesizer):
     def __init__(self, registry, beam_width: int = 3):
         super().__init__(registry)
         self.beam_width = beam_width
-    
+
     def _to_candidate(self, graph: AgentGraph) -> ArchitectureCandidate:
         return ArchitectureCandidate(
             graph=graph,
@@ -26,7 +25,7 @@ class ParetoPartialBeamSynthesizer(Synthesizer):
             total_latency=graph.total_latency(),
             total_reliability=graph.aggregate_reliability(),
         )
-    
+
     def _diversity_truncate(
         self, candidates: List[ArchitectureCandidate]
     ) -> List[ArchitectureCandidate]:
@@ -39,7 +38,7 @@ class ParetoPartialBeamSynthesizer(Synthesizer):
 
         if len(candidates) <= self.beam_width:
             return candidates
-        
+
         step = len(candidates) / self.beam_width
         selected = []
 
@@ -48,17 +47,17 @@ class ParetoPartialBeamSynthesizer(Synthesizer):
             selected.append(candidates[idx])
 
         return selected
-    
+
     def synthesize(
-        self, 
-        task: TaskSpecification, 
+        self,
+        task: TaskSpecification,
         budget: SynthesisBudget = None
     ) -> List[ArchitectureCandidate]:
 
         task.validate()
 
         context = SynthesisContext(budget)
-        
+
         # Start with empty graph
         beam_graphs: List[AgentGraph] = [AgentGraph()]
 
@@ -77,7 +76,7 @@ class ParetoPartialBeamSynthesizer(Synthesizer):
                     continue
 
                 for component in candidates:
-                    
+
                     new_graph = graph.copy()
 
                     node_id = f"{component.name}_{stage_idx}"
@@ -87,16 +86,16 @@ class ParetoPartialBeamSynthesizer(Synthesizer):
                         prev_nodes = list(new_graph._graph.nodes)
                         if len(prev_nodes) > 1:
                             new_graph.add_edge(prev_nodes[-2], prev_nodes[-1])
-                    
+
                     expanded_graphs.append(new_graph)
-            
+
             # Convert expanded graphs to partial candidates
             pareto = ParetoSet()
 
             for graph in expanded_graphs:
                 candidate = self._to_candidate(graph)
                 pareto.add(candidate)
-            
+
             partial_candidates = list(pareto)
 
             # If not final stage, apply beam width constraint
@@ -104,13 +103,13 @@ class ParetoPartialBeamSynthesizer(Synthesizer):
             if stage_idx < len(task.required_capabilities) - 1:
                 if len(partial_candidates) > self.beam_width:
                     partial_candidates = self._diversity_truncate(partial_candidates)
-                
+
                 beam_graphs = [c.graph for c in partial_candidates]
-            
+
             else:
                 # Final stage - keep all
                 beam_graphs = [c.graph for c in partial_candidates]
-        
+
         final_pareto_set = ParetoSet()
 
         for graph in beam_graphs:
@@ -135,8 +134,8 @@ class ParetoPartialBeamSynthesizer(Synthesizer):
                 total_cost=total_cost,
                 total_latency=total_latency,
                 total_reliability=total_reliability,
-            )        
+            )
 
             final_pareto_set.add(candidate=candidate)
-        
+
         return list(final_pareto_set)

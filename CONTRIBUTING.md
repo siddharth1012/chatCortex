@@ -32,6 +32,12 @@ Run tests:
 pytest
 ```
 
+Try the quickstart:
+
+```bash
+python examples/quickstart.py
+```
+
 ## Code Style
 
 ChatCortex uses:
@@ -43,7 +49,7 @@ Run:
 
 ```bash
 black .
-ruff .
+ruff check chatcortex tests examples
 ```
 
 ## Pull Requests
@@ -70,3 +76,7 @@ ChatCortex welcomes contributions related to:
 * multi-objective optimization
 * agent system evaluation
 * experimental benchmarks
+
+## Code of Conduct
+
+All participants are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md).

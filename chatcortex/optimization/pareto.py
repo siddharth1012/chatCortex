@@ -34,7 +34,7 @@ def compute_pareto_front(
     """
     Exact O(n^2) Pareto front computation.
     """
-    
+
     pareto = []
 
     for candidate in candidates:
@@ -44,10 +44,10 @@ def compute_pareto_front(
             if other is not candidate and dominates(other, candidate):
                 dominated = True
                 break
-        
+
         if not dominated:
             pareto.append(candidate)
-    
+
     return pareto
 
 
@@ -67,13 +67,13 @@ class ParetoSet:
 
     def __iter__(self):
         return iter(self._set)
-    
+
     def __len__(self):
         return len(self._set)
-    
+
     def as_set(self) -> Set[ArchitectureCandidate]:
         return set(self._set)
-    
+
     def add(self, candidate: ArchitectureCandidate) -> bool:
         """
         Adds candidate if non-dominated
@@ -82,7 +82,7 @@ class ParetoSet:
         Returns:
             - True if candidate is added,
             - False if candidate was dominated
-        """ 
+        """
 
         to_remove = []
 
@@ -91,10 +91,10 @@ class ParetoSet:
                 return False # candidate dominated by existing
             if dominates(candidate, existing):
                 to_remove.append(existing)
-        
+
         for item in to_remove:
             self._set.remove(item)
-        
+
         self._set.add(candidate)
 
         return True
@@ -108,7 +108,7 @@ def frontier_coverage(
     Metric based frontier coverage
     Coverage is computed over objective tuples:
         - (total_cost, total_latency, total_reliability)
-    
+
     This avoids dependency on object identity or graph instance equality
     """
 
@@ -124,7 +124,7 @@ def frontier_coverage(
 
     if not true_metrics:
         return 1.0
-    
+
     return len(true_metrics & approx_metrics) / len(true_metrics)
 
 def dominance_rank(
@@ -137,7 +137,7 @@ def dominance_rank(
     Rank 1 -> Non-dominated (Pareto)
     Rank 2 -> Dominated only by rank 1
 
-    O(n^2) layered ranking 
+    O(n^2) layered ranking
     """
 
     remaining = list(population)
@@ -146,9 +146,9 @@ def dominance_rank(
     while remaining:
         current_front = compute_pareto_front(remaining)
 
-        if candidate in current_front: 
+        if candidate in current_front:
             return rank
-        
+
         remaining = [c for c in remaining if c not in current_front]
         rank += 1
 
@@ -176,7 +176,7 @@ def hypervolume_monte_carlo(
 
     if not frontier:
         return 0.0
-    
+
     ref_cost, ref_latency, ref_reliability = reference_point
 
     random_number_generator = random.Random(seed)
@@ -197,7 +197,7 @@ def hypervolume_monte_carlo(
             ):
                 dominated_count += 1
                 break
-    
+
     box_volume = ref_cost * ref_latency * (1.0 - ref_reliability)
 
     return (dominated_count / num_samples) * box_volume

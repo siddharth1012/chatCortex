@@ -13,19 +13,19 @@ class ProgressiveParetoBeamSynthesizer(Synthesizer):
     Progressive Beam Widening
 
     Beam width increses with stage depth
-    Built on ParetoPartialBeamv3 logic    
+    Built on ParetoPartialBeamv3 logic
     """
 
     def __init__(
-        self, 
-        registry, 
+        self,
+        registry,
         base_beam_width: int = 5,
         growth_factor: float = 1.8,
     ):
         super().__init__(registry)
         self.base_beam_width = base_beam_width
         self.growth_factor = growth_factor
-    
+
     def _stage_width(self, stage_idx: int) -> int:
         return max(
             1,
@@ -41,14 +41,14 @@ class ProgressiveParetoBeamSynthesizer(Synthesizer):
         )
 
     def synthesize(
-        self, 
-        task: TaskSpecification, 
+        self,
+        task: TaskSpecification,
         budget: SynthesisBudget = None
     ) -> List[ArchitectureCandidate]:
 
         task.validate()
         context = SynthesisContext(budget)
-        
+
         # Start with empty graph
         beam_graphs: List[AgentGraph] = [AgentGraph()]
 
@@ -67,7 +67,7 @@ class ProgressiveParetoBeamSynthesizer(Synthesizer):
                     continue
 
                 for component in candidates:
-                    
+
                     new_graph = graph.copy()
 
                     node_id = f"{component.name}_{stage_idx}"
@@ -77,16 +77,16 @@ class ProgressiveParetoBeamSynthesizer(Synthesizer):
                         prev_nodes = list(new_graph._graph.nodes)
                         if len(prev_nodes) > 1:
                             new_graph.add_edge(prev_nodes[-2], prev_nodes[-1])
-                    
+
                     expanded_graphs.append(new_graph)
-            
+
             # Convert expanded graphs to partial candidates
             pareto = ParetoSet()
 
             for graph in expanded_graphs:
                 candidate = self._to_candidate(graph)
                 pareto.add(candidate)
-            
+
             partial_candidates = list(pareto)
 
             # Progressive width constraint (not final stage)
@@ -109,7 +109,7 @@ class ProgressiveParetoBeamSynthesizer(Synthesizer):
             else:
                 # Final stage - keep all
                 beam_graphs = [c.graph for c in partial_candidates]
-        
+
         final_pareto_set = ParetoSet()
 
         for graph in beam_graphs:
@@ -134,8 +134,8 @@ class ProgressiveParetoBeamSynthesizer(Synthesizer):
                 total_cost=total_cost,
                 total_latency=total_latency,
                 total_reliability=total_reliability,
-            )        
+            )
 
             final_pareto_set.add(candidate=candidate)
-        
+
         return list(final_pareto_set)

@@ -1,4 +1,3 @@
-import time 
 from typing import Dict, List
 
 
@@ -9,7 +8,7 @@ class TelemetryLogger:
 
     def __init__(self):
         self.records: List[Dict] = []
-    
+
     def log(
         self,
         component_name: str,
@@ -25,7 +24,7 @@ class TelemetryLogger:
                 "success": success
             }
         )
-    
+
     def summary(self) -> Dict:
         total_cost = sum(r["cost"] for r in self.records)
         total_latency = sum(r["latency_ms"] for r in self.records)
@@ -37,4 +36,3 @@ class TelemetryLogger:
             "success": overall_success,
             "steps": len(self.records),
         }
-    

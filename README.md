@@ -1,321 +1,130 @@
 # ChatCortex
 
-**ChatCortex** is a framework for **automated synthesis and optimization
-of AI agent architectures**.
+[![CI](https://github.com/siddharth1012/chatCortex/actions/workflows/ci.yml/badge.svg)](https://github.com/siddharth1012/chatCortex/actions/workflows/ci.yml)
+[![PyPI version](https://img.shields.io/pypi/v/chatcortex)](https://pypi.org/project/chatcortex/)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Instead of manually wiring LLM pipelines such as:
+**ChatCortex** is a framework for **automated synthesis and optimization of AI agent architectures** — think *AutoML for AI agents*.
 
-retrieval → LLM → verifier → tool
+Instead of manually wiring LLM pipelines (`retrieval → LLM → verifier → tool`), ChatCortex treats agent design as a **multi-objective architecture search problem** and automatically discovers architectures that optimize **cost**, **latency**, and **reliability** simultaneously.
 
-ChatCortex treats agent design as a **multi-objective architecture
-search problem** and automatically discovers architectures that
-optimize:
-
--   **Cost**
--   **Latency**
--   **Reliability**
-
-The project can be viewed as **AutoML for AI Agents**.
-
-------------------------------------------------------------------------
-
-# Vision
-
-Modern AI agents are typically constructed through manual orchestration
-of:
-
--   Large Language Models
--   Retrieval systems
--   Tools and APIs
--   Verification modules
--   Memory systems
-
-This approach is often:
-
--   brittle
--   expensive
--   difficult to optimize
--   difficult to reproduce
-
-ChatCortex introduces a **formal synthesis framework** where agent
-architectures are **automatically generated from task specifications**
-and evaluated under system constraints.
-
-Long-term goal:
-
-> Automated synthesis of reliable AI agents from high-level intent.
-
-------------------------------------------------------------------------
-
-# Key Idea
-
-Instead of designing agent pipelines manually:
-
-Engineer → Manual Pipeline Design
-
-ChatCortex enables:
-
+```
 Task Specification → Architecture Search → Pareto-Optimal Architectures
-
-Architectures are evaluated across multiple objectives:
-
--   **minimize cost**
--   **minimize latency**
--   **maximize reliability**
-
-------------------------------------------------------------------------
-
-# Architecture Overview
-
-ChatCortex is organized as a layered architecture synthesis system.
-
-TaskSpecification\
-↓\
-CapabilityRegistry\
-↓\
-Synthesis Engine\
-↓\
-AgentGraph (DAG)\
-↓\
-Execution Engine\
-↓\
-Telemetry\
-↓\
-Evaluation Harness\
-↓\
-Pareto Optimization
-
-Each layer isolates a specific concern in automated agent architecture
-synthesis.
-
-------------------------------------------------------------------------
-
-# Core Components
-
-## ComponentMetadata
-
-Formal representation of agent components such as:
-
--   language models
--   retrieval systems
--   tools
--   verification modules
--   memory modules
-
-Each component defines:
-
--   capabilities
--   cost per call
--   latency
--   reliability score
--   privacy level
-
-Components are immutable and purely declarative.
-
-------------------------------------------------------------------------
-
-## CapabilityRegistry
-
-Central registry responsible for:
-
--   component registration
--   capability filtering
--   privacy constraint enforcement
-
-The registry **does not perform optimization** --- it only provides
-valid components for synthesis.
-
-------------------------------------------------------------------------
-
-## TaskSpecification
-
-Defines the architecture synthesis problem.
-
-Example:
-
-``` python
-from chatcortex import TaskSpecification
-
-task = TaskSpecification(
-    required_capabilities=[
-        "retrieval",
-        "generation",
-        "verification"
-    ],
-    max_cost=0.01,
-    max_latency=2000
-)
 ```
 
-------------------------------------------------------------------------
+## Installation
 
-## Synthesizers
-
-ChatCortex includes multiple architecture synthesis strategies.
-
--   **HeuristicSynthesizer** --- Greedy deterministic architecture
-    construction.
--   **RandomSynthesizer** --- Random baseline for stochastic
-    exploration.
--   **BeamSynthesizer** --- Budget-aware approximate architecture
-    search.
--   **ExhaustiveSynthesizer** --- Computes the exact Pareto frontier.
--   **ProgressiveParetoBeamSynthesizer (v0.4.0)** --- Depth-aware beam
-    widening improving Pareto recovery.
-
-------------------------------------------------------------------------
-
-# AgentGraph
-
-Agent architectures are represented as **Directed Acyclic Graphs
-(DAGs)**.
-
-Aggregated metrics:
-
--   total cost (additive)
--   total latency (sequential assumption)
--   reliability (multiplicative model)
-
-------------------------------------------------------------------------
-
-# Execution Engine
-
-Two execution modes:
-
-### Deterministic Mode
-
-Used for structural validation and reproducible testing.
-
-### Probabilistic Mode
-
-Simulates real-world reliability using component success probabilities.
-
-------------------------------------------------------------------------
-
-# Evaluation Harness
-
-Supports:
-
--   multiple tasks
--   multiple synthesizers
--   stochastic trials
--   reproducible experiments
-
-Outputs:
-
--   average cost
--   average latency
--   success rate
-
-------------------------------------------------------------------------
-
-# Multi-Objective Evaluation Metrics
-
--   **Pareto Coverage**
--   **Hypervolume Loss**
--   **Average Regret (cost, latency, reliability)**
-
-------------------------------------------------------------------------
-
-# Example
-
-``` python
-from chatcortex import TaskSpecification, BeamSynthesizer
-
-task = TaskSpecification(
-    required_capabilities=[
-        "retrieval",
-        "generation",
-        "verification"
-    ]
-)
-
-synth = BeamSynthesizer(beam_width=5)
-
-architectures = synth.synthesize(task)
-
-for arch in architectures:
-    print(arch.total_cost(), arch.total_latency())
-```
-
-------------------------------------------------------------------------
-
-# Installation
-
-``` bash
+```bash
 pip install chatcortex
 ```
 
-------------------------------------------------------------------------
+Or from source:
 
-# Research Context
+```bash
+git clone https://github.com/siddharth1012/chatCortex
+cd chatCortex
+pip install -e .
+```
 
-ChatCortex is a **controlled experimental platform for studying
-automated AI agent architecture synthesis**.
+## Quickstart
 
-Research areas:
+```python
+from chatcortex import (
+    TaskSpecification,
+    BeamSynthesizer,
+    build_demo_registry,
+)
 
--   multi-objective optimization
--   architecture search
--   AI agent systems
--   reliability-cost tradeoffs
--   AutoML-style agent design
+# A registry of components with cost/latency/reliability tradeoffs
+registry = build_demo_registry(
+    capabilities=("retrieval", "generation", "verification")
+)
 
-------------------------------------------------------------------------
+# The task: an ordered capability chain with hard constraints
+task = TaskSpecification(
+    required_capabilities=["retrieval", "generation", "verification"],
+    max_cost=0.02,
+    max_latency=1500,
+)
 
-# Experimental Validation
+# Synthesize Pareto-optimal architectures
+synth = BeamSynthesizer(registry, beam_width=5)
+for arch in synth.synthesize(task):
+    print(
+        f"cost=${arch.total_cost:.4f} "
+        f"latency={arch.total_latency:.0f}ms "
+        f"reliability={arch.total_reliability:.3f}"
+    )
+```
 
-Tested on dense architecture spaces:
+Or run the full demo comparing three synthesis strategies:
 
--   5-stage synthesis pipelines
--   up to 95-point Pareto frontiers
--   budget sweeps from 20 → 180 evaluations
--   beam width sweeps from 3 → 15
+```bash
+python examples/quickstart.py
+```
 
-Progressive Pareto Beam Widening demonstrates improved Pareto recovery
-compared to static beam strategies.
+To search over your own components, build a `CapabilityRegistry` and register
+`ComponentMetadata` describing each model, tool, or verifier — see
+`examples/` for complete walkthroughs.
 
-------------------------------------------------------------------------
+## How It Works
 
-# Roadmap
+ChatCortex is organized as a layered architecture synthesis system:
 
-### Phase 1 --- Foundations
+```
+TaskSpecification → CapabilityRegistry → Synthesis Engine → AgentGraph (DAG)
+    → Execution Engine → Telemetry → Evaluation Harness → Pareto Optimization
+```
 
--   component modeling
--   capability registry
--   task specification
--   agent graph representation
+**Core concepts:**
 
-### Phase 2 --- Exact Optimization
+- **ComponentMetadata** — declarative description of an agent component (model, retriever, tool, verifier, memory) with cost per call, latency, reliability score, and privacy level.
+- **CapabilityRegistry** — stores components and filters candidates by capability and privacy constraints.
+- **TaskSpecification** — the synthesis problem: an ordered capability chain plus hard constraints (max cost, max latency, privacy) and objective weights.
+- **AgentGraph** — architectures represented as DAGs; cost is additive, latency sequential, reliability multiplicative.
+- **Synthesizers** — search strategies that map a task to an (approximate) Pareto frontier.
 
--   exhaustive architecture search
--   exact Pareto frontier computation
+**Available synthesizers:**
 
-### Phase 3 --- Budget-Aware Search (Complete)
+| Synthesizer | Strategy |
+|---|---|
+| `HeuristicSynthesizer` | Greedy deterministic construction |
+| `RandomSynthesizer` | Random baseline |
+| `BeamSynthesizer` | Budget-aware beam search |
+| `ParetoPartialBeamSynthesizer` | Beam search with per-stage Pareto pruning |
+| `ProgressiveParetoBeamSynthesizer` | Depth-aware beam widening (best Pareto recovery) |
+| `ExhaustiveSynthesizer` | Exact Pareto frontier (small spaces) |
 
--   beam search synthesis
--   Pareto-aware pruning
--   progressive beam widening
+Approximation quality is measured with **Pareto coverage**, **hypervolume loss**, and **average regret** — see [docs/BENCHMARKS.md](docs/BENCHMARKS.md).
 
-### Future Directions
+## Documentation
 
--   graph-structured agent synthesis
--   real model / tool integrations
--   enterprise optimization layers
+- [Architecture](docs/ARCHITECTURE.md) — system design and component layers
+- [Benchmarks](docs/BENCHMARKS.md) — experimental evaluation of synthesis strategies
+- [Examples](examples/) — runnable demos and budget-sweep experiments
+- [Contributing](CONTRIBUTING.md) — development setup and PR guidelines
+- [Changelog](CHANGELOG.md)
 
-------------------------------------------------------------------------
+## Research Context
 
-# Status
+ChatCortex is a controlled experimental platform for studying automated agent architecture synthesis: multi-objective optimization, architecture search, reliability–cost tradeoffs, and AutoML-style agent design. Experiments cover 5-stage pipelines with Pareto frontiers up to 95 architectures and evaluation budgets from 20 to 180 evaluations; progressive beam widening shows improved Pareto recovery over static beam strategies.
 
-ChatCortex is currently a **research framework under active
-development**.
+If you use ChatCortex in your research, please cite it (see [CITATION.cff](CITATION.cff)).
 
-------------------------------------------------------------------------
+## Roadmap
 
-# License
+- [x] Component modeling, capability registry, task specification, DAG representation
+- [x] Exact Pareto frontier computation (exhaustive search)
+- [x] Budget-aware beam search with Pareto pruning and progressive widening
+- [ ] Graph-structured (non-chain) agent synthesis
+- [ ] Real model / tool integrations
+- [ ] Registry loading from YAML/JSON
 
-MIT License
+## Status
 
-------------------------------------------------------------------------
+Research framework under active development (alpha). APIs may change between minor versions.
 
-Developed by **Siddharth Saraswat**
+## License
+
+[MIT](LICENSE) — developed by **Siddharth Saraswat**

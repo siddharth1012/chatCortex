@@ -12,14 +12,20 @@ Core capabilities include:
 - Pareto frontier analysis
 """
 
-from .synthesis.task_specification import TaskSpecification
-
-from .synthesis.heuristic_synthesizer import HeuristicSynthesizer
-from .synthesis.random_synthesizer import RandomSynthesizer
-from .synthesis.beam_synthesizer import BeamSynthesizer
-from .synthesis.exhaustive_synthesizer import ExhaustiveSynthesizer
-
 from .graph.agent_graph import AgentGraph
+from .registry.capability_registry import CapabilityRegistry
+from .registry.demo_components import build_demo_registry
+from .registry.metadata import ComponentMetadata
+from .synthesis.beam_synthesizer import BeamSynthesizer
+from .synthesis.budget import SynthesisBudget
+from .synthesis.exhaustive_synthesizer import ExhaustiveSynthesizer
+from .synthesis.heuristic_synthesizer import HeuristicSynthesizer
+from .synthesis.pareto_partial_beam_synthesizer import ParetoPartialBeamSynthesizer
+from .synthesis.progressive_pareto_beam_synthesizer import (
+    ProgressiveParetoBeamSynthesizer,
+)
+from .synthesis.random_synthesizer import RandomSynthesizer
+from .synthesis.task_specification import TaskSpecification
 
 __all__ = [
     "TaskSpecification",
@@ -27,7 +33,13 @@ __all__ = [
     "RandomSynthesizer",
     "BeamSynthesizer",
     "ExhaustiveSynthesizer",
+    "ParetoPartialBeamSynthesizer",
+    "ProgressiveParetoBeamSynthesizer",
+    "SynthesisBudget",
     "AgentGraph",
+    "CapabilityRegistry",
+    "ComponentMetadata",
+    "build_demo_registry",
 ]
 
 __version__ = "0.4.0"
