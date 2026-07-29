@@ -42,4 +42,4 @@ __all__ = [
     "build_demo_registry",
 ]
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
