@@ -4,7 +4,7 @@
 # 1. Extension to DAG like task definitions
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Literal
+from typing import Dict, List, Literal, Optional
 
 PrivacyLevel = Literal["internal", "external", "hybrid"]
 
@@ -14,7 +14,7 @@ class TaskSpecification:
     """
     Formal definition of a task for agent synthesis
 
-    A task consists of: 
+    A task consists of:
     1. An ordered sequence of required capabilities
     2. Hard constraints - cost, latency, privacy
     3. objective weighting for optimization
@@ -43,9 +43,8 @@ class TaskSpecification:
         """
 
         if not self.required_capabilities:
-            ValueError(f"Task must define at least one required capability")
-        
+            raise ValueError("Task must define at least one required capability")
+
         for key in self.objective_weights:
             if key not in {"cost", "latency", "error"}:
                 raise ValueError(f"Invalid objective weight key: {key}")
-            

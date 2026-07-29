@@ -1,10 +1,9 @@
 from dataclasses import dataclass
-from typing import List, Dict, Literal, Optional
-
+from typing import Dict, List, Literal, Optional
 
 ComponentType = Literal["model", "tool", "memory", "verification"]
 PrivacyLevel = Literal["internal", "external", "hybrid"]
- 
+
 
 # Keep frozen to True for immutability - Metadata should not mutate during runtime
 @dataclass(frozen=True)
@@ -29,7 +28,7 @@ class ComponentMetadata:
     avg_latency_ms: float
 
     # Abstract for now, later on can introduce correlated failures, retries, fallback strategies
-    
+
     reliability_score: float # 0.0 to 1.0
 
     # Governance constraints

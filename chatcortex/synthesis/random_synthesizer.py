@@ -16,15 +16,29 @@ class RandomSynthesizer(Synthesizer):
     v0.3.0 baseline strategy
         - Uniformly samples architectures under evaluation budget
         - maintains incremental Pareto frontier
+
+    If no budget is provided, defaults to DEFAULT_MAX_EVALUATIONS samples.
     """
 
+    DEFAULT_MAX_EVALUATIONS = 200
+
     def synthesize(
-        self, 
-        task: TaskSpecification, 
+        self,
+        task: TaskSpecification,
         budget: SynthesisBudget = None
     ) -> List[ArchitectureCandidate]:
 
         task.validate()
+
+        # Without a budget the sampling loop below would never terminate,
+        # so default to a bounded number of evaluations.
+        if budget is None:
+            budget = SynthesisBudget(max_evaluations=self.DEFAULT_MAX_EVALUATIONS)
+        elif budget.max_evaluations is None and budget.max_time_seconds is None:
+            budget = SynthesisBudget(
+                max_evaluations=self.DEFAULT_MAX_EVALUATIONS,
+                random_seed=budget.random_seed,
+            )
 
         context = SynthesisContext(budget)
         pareto_set = ParetoSet()
@@ -44,7 +58,7 @@ class RandomSynthesizer(Synthesizer):
 
             candidates_list.append(candidates)
 
-        
+
         while True:
 
             graph = AgentGraph()
@@ -53,20 +67,20 @@ class RandomSynthesizer(Synthesizer):
             # Randomly select one component per capability
 
             for idx, candidates in enumerate(candidates_list):
-                component = random_number_generation.choice(candidates) 
+                component = random_number_generation.choice(candidates)
                 node_id = f"{component.name}_{idx}"
                 graph.add_component(node_id, component)
 
                 if previous_node:
                     graph.add_edge(previous_node, node_id)
-                
+
                 previous_node = node_id
-            
+
             try:
                 context.register_evaluation()
             except BudgetExceeded:
                 break
-            
+
             total_cost = graph.total_cost()
             total_latency = graph.total_latency()
             total_reliability = graph.aggregate_reliability()
@@ -82,8 +96,8 @@ class RandomSynthesizer(Synthesizer):
                 total_cost=total_cost,
                 total_latency=total_latency,
                 total_reliability=total_reliability,
-            )        
+            )
 
             pareto_set.add(candidate=candidate)
-                
+
         return list(pareto_set)

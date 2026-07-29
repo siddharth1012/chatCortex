@@ -26,17 +26,17 @@ class BeamSynthesizer(Synthesizer):
             + weights["latency"] * meta.avg_latency_ms
             - weights["error"] * meta.reliability_score
         )
-    
+
     def synthesize(
-        self, 
-        task: TaskSpecification, 
+        self,
+        task: TaskSpecification,
         budget: SynthesisBudget = None
     ) -> List[ArchitectureCandidate]:
 
         task.validate()
 
         context = SynthesisContext(budget)
-        
+
         # Each beam element = (graph, cumulative_score)
         beam: List[Tuple[AgentGraph, float]] = [(AgentGraph(), 0.0)]
 
@@ -55,7 +55,7 @@ class BeamSynthesizer(Synthesizer):
                     continue
 
                 for component in candidates:
-                    
+
                     new_graph = graph.copy()
 
                     node_id = f"{component.name}_{stage_idx}"
@@ -65,7 +65,7 @@ class BeamSynthesizer(Synthesizer):
                         prev_nodes = list(new_graph._graph.nodes)
                         if len(prev_nodes) > 1:
                             new_graph.add_edge(prev_nodes[-2], prev_nodes[-1])
-                    
+
                     score_increment = self._score(
                         component, task.objective_weights
                     )
@@ -73,14 +73,14 @@ class BeamSynthesizer(Synthesizer):
                     new_beam.append(
                         (new_graph, cumulative_score + score_increment)
                     )
-            
+
             # Keep top-k
             new_beam.sort(key=lambda x: x[1])
             if stage_idx < len(task.required_capabilities) - 1:
                 beam = new_beam[: self.beam_width]
             else:
                 beam = new_beam # Keep all final candidates
-        
+
         beam.sort(key=lambda x: x[1])
         pareto_set = ParetoSet()
 
@@ -106,8 +106,8 @@ class BeamSynthesizer(Synthesizer):
                 total_cost=total_cost,
                 total_latency=total_latency,
                 total_reliability=total_reliability,
-            )        
+            )
 
             pareto_set.add(candidate=candidate)
-        
+
         return list(pareto_set)

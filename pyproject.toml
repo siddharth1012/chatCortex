@@ -70,3 +70,14 @@ include = ["chatcortex*"]
 
 [tool.setuptools]
 include-package-data = true
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]
