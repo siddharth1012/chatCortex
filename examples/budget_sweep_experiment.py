@@ -4,15 +4,6 @@ from chatcortex.evaluation.approximation_metrics import evaluate_approximation
 from chatcortex.synthesis.beam_synthesizer import BeamSynthesizer
 from chatcortex.synthesis.budget import SynthesisBudget
 from chatcortex.synthesis.exhaustive_synthesizer import ExhaustiveSynthesizer
-from chatcortex.synthesis.experimental.pareto_partial_beam_synthesizer_v2 import (
-    ParetoPartialBeamSynthesizerV2,
-)
-from chatcortex.synthesis.experimental.pareto_partial_beam_synthesizer_v3 import (
-    ParetoPartialBeamSynthesizerV3,
-)
-from chatcortex.synthesis.experimental.system_score_beam_synthesizer import (
-    SystemScoreBeamSynthesizer,
-)
 from chatcortex.synthesis.heuristic_synthesizer import HeuristicSynthesizer
 from chatcortex.synthesis.pareto_partial_beam_synthesizer import ParetoPartialBeamSynthesizer
 from chatcortex.synthesis.progressive_pareto_beam_synthesizer import (
@@ -115,7 +106,7 @@ def run_budget_sweep(registry, task):
         )
 
         # --------------------------------------------------------------
-        # Beam Comparison (Scalar vs SystemScore vs ParetoPartial)
+        # Beam Comparison (Scalar vs ParetoPartial vs Progressive)
         # --------------------------------------------------------------
         for w in beam_widths:
 
@@ -152,38 +143,6 @@ def run_budget_sweep(registry, task):
             )
 
             # -------------------------
-            # SystemScore Beam (Phase 4A)
-            # -------------------------
-            system_budget = SynthesisBudget(max_evaluations=b, random_seed=42)
-            system_beam = SystemScoreBeamSynthesizer(registry, beam_width=w)
-            system_frontier = system_beam.synthesize(task, system_budget)
-
-            system_report = evaluate_approximation(
-                approx_frontier=system_frontier,
-                true_frontier=true_frontier,
-                reference_point=reference_point,
-            )
-
-            results.append({
-                "algorithm": "SystemScoreBeam",
-                "budget": b,
-                "beam_width": w,
-                "coverage_mean": system_report["coverage"],
-                "coverage_std": 0.0,
-                "hypervolume_loss_mean": system_report["hypervolume_loss"],
-                "hypervolume_loss_std": 0.0,
-                "avg_cost_regret": system_report["avg_cost_regret"],
-                "avg_latency_regret": system_report["avg_latency_regret"],
-                "avg_reliability_regret": system_report["avg_reliability_regret"],
-            })
-
-            print(
-                f"SystemScoreBeam (w={w}): "
-                f"coverage={system_report['coverage']:.2f}, "
-                f"hv_loss={system_report['hypervolume_loss']:.2f}"
-            )
-
-            # -------------------------
             # ParetoPartial Beam (Phase 4B)
             # -------------------------
             pareto_budget = SynthesisBudget(max_evaluations=b, random_seed=42)
@@ -211,70 +170,6 @@ def run_budget_sweep(registry, task):
 
             print(
                 f"ParetoPartialBeam (w={w}): "
-                f"coverage={pareto_report['coverage']:.2f}, "
-                f"hv_loss={pareto_report['hypervolume_loss']:.2f}"
-            )
-
-            # -------------------------
-            # ParetoPartial V2 Beam (Phase 4B)
-            # -------------------------
-            pareto_budget = SynthesisBudget(max_evaluations=b, random_seed=42)
-            pareto_beam = ParetoPartialBeamSynthesizerV2(registry, beam_width=w)
-            pareto_frontier = pareto_beam.synthesize(task, pareto_budget)
-
-            pareto_report = evaluate_approximation(
-                approx_frontier=pareto_frontier,
-                true_frontier=true_frontier,
-                reference_point=reference_point,
-            )
-
-            results.append({
-                "algorithm": "ParetoPartialBeamV2",
-                "budget": b,
-                "beam_width": w,
-                "coverage_mean": pareto_report["coverage"],
-                "coverage_std": 0.0,
-                "hypervolume_loss_mean": pareto_report["hypervolume_loss"],
-                "hypervolume_loss_std": 0.0,
-                "avg_cost_regret": pareto_report["avg_cost_regret"],
-                "avg_latency_regret": pareto_report["avg_latency_regret"],
-                "avg_reliability_regret": pareto_report["avg_reliability_regret"],
-            })
-
-            print(
-                f"ParetoPartialBeamV2 (w={w}): "
-                f"coverage={pareto_report['coverage']:.2f}, "
-                f"hv_loss={pareto_report['hypervolume_loss']:.2f}"
-            )
-
-            # -------------------------
-            # ParetoPartial V3 Beam (Phase 4B)
-            # -------------------------
-            pareto_budget = SynthesisBudget(max_evaluations=b, random_seed=42)
-            pareto_beam = ParetoPartialBeamSynthesizerV3(registry, beam_width=w)
-            pareto_frontier = pareto_beam.synthesize(task, pareto_budget)
-
-            pareto_report = evaluate_approximation(
-                approx_frontier=pareto_frontier,
-                true_frontier=true_frontier,
-                reference_point=reference_point,
-            )
-
-            results.append({
-                "algorithm": "ParetoPartialBeamV3",
-                "budget": b,
-                "beam_width": w,
-                "coverage_mean": pareto_report["coverage"],
-                "coverage_std": 0.0,
-                "hypervolume_loss_mean": pareto_report["hypervolume_loss"],
-                "hypervolume_loss_std": 0.0,
-                "avg_cost_regret": pareto_report["avg_cost_regret"],
-                "avg_latency_regret": pareto_report["avg_latency_regret"],
-                "avg_reliability_regret": pareto_report["avg_reliability_regret"],
-            })
-
-            print(
-                f"ParetoPartialBeamV3 (w={w}): "
                 f"coverage={pareto_report['coverage']:.2f}, "
                 f"hv_loss={pareto_report['hypervolume_loss']:.2f}"
             )

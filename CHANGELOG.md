@@ -20,7 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 - Demo scripts moved from the package to `examples/`
-- Research-iteration synthesizers (v2, v3, system-score) moved to `chatcortex.synthesis.experimental`
+- Removed research-iteration synthesizers (v2, v3, system-score); their logic is superseded by `ProgressiveParetoBeamSynthesizer` and they remain available in git history
 - README rewritten with a working, tested quickstart
 
 ## [0.4.0] - 2026-03-08
