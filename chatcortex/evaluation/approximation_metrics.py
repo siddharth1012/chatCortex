@@ -16,7 +16,7 @@ def compute_hypervolume(
     reference_point: Tuple[float, float, float],
 ) -> float:
     return hypervolume_monte_carlo(frontier, reference_point)
-    
+
 
 def hypervolume_loss(
     approx_frontier,
@@ -55,8 +55,8 @@ def hypervolume_loss(
             ):
                 dominated_approx += 1
                 break
-    
-    
+
+
     box_volume = ref_cost * ref_latency * (1.0 - ref_reliability)
 
     hv_true = (dominated_true / num_samples) * box_volume
@@ -79,7 +79,7 @@ def additive_regret(
 
     if not dominating:
         return (0.0, 0.0, 0.0)
-    
+
     min_cost_diff = min(candidate.total_cost - p.total_cost for p in dominating)
     min_latency_diff = min(candidate.total_latency - p.total_latency for p in dominating)
     min_reliability_diff = min(p.total_reliability - candidate.total_reliability for p in dominating)
@@ -112,7 +112,7 @@ def average_regret(
         total_cost_regret += cr
         total_latency_regret += lr
         total_reliability_regret += rr
-    
+
     n = len(approx_list)
 
     return (
@@ -131,7 +131,7 @@ def evaluate_approximation(
     """
 
     coverage = compute_coverage(approx_frontier, true_frontier)
-    
+
     hv_loss = hypervolume_loss(approx_frontier, true_frontier, reference_point)
     avg_regret = average_regret(approx_frontier, true_frontier)
 

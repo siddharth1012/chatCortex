@@ -1,5 +1,5 @@
-from dataclasses import dataclass
 import time
+from dataclasses import dataclass
 from typing import Optional
 
 
@@ -20,7 +20,7 @@ class SynthesisBudget:
 class BudgetExceeded(Exception):
     """
     Raised when synthesis budget is exhausted
-    """ 
+    """
     pass
 
 
@@ -34,7 +34,7 @@ class SynthesisContext:
         self.budget = budget
         self.evaluations: int = 0
         self.start_time: float = time.time()
-    
+
     def _check_evaluation_limit(self):
         if (
             self.budget
@@ -42,7 +42,7 @@ class SynthesisContext:
             and self.evaluations >= self.budget.max_evaluations
         ):
             raise BudgetExceeded("Maximum evaluation budget reached")
-    
+
     def _check_time_limit(self):
         if (
             self.budget
@@ -50,7 +50,7 @@ class SynthesisContext:
             and (time.time() - self.start_time) >= self.budget.max_time_seconds
         ):
             raise BudgetExceeded("Maximum time budget reached")
-    
+
     def can_evaluate(self) -> bool:
         try:
             self._check_evaluation_limit()
@@ -58,7 +58,7 @@ class SynthesisContext:
             return True
         except BudgetExceeded:
             return False
-    
+
     def register_evaluation(self):
         """
         Must be called every time an architecture is evaluated

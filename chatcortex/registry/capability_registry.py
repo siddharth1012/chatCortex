@@ -1,12 +1,13 @@
 # Stores components, filters by capability and constraints
 
-# To-Do: 
+# To-Do:
 # 1. Support loading from YAML, JSON (Experimental)
 # 2. Support dynamic runtime registration
 
 
 # Simple in-memory registration for v0.2.0
-from typing import Optional, List
+from typing import List, Optional
+
 from .metadata import ComponentMetadata, PrivacyLevel
 
 
@@ -22,20 +23,20 @@ class CapabilityRegistry:
 
     def __init__(self):
         self._components: dict[str, ComponentMetadata] = {}
-    
+
     # Registration
 
     def register(self, metadata: ComponentMetadata) -> None:
         if metadata.name in self._components:
             raise ValueError(f"Component '{metadata.name}' already registered.")
         self._components[metadata.name] = metadata
-    
+
     def get(self, name: str) -> ComponentMetadata:
         return self._components[name]
-    
+
     def list_all(self) -> List[ComponentMetadata]:
         return list(self._components.values())
-    
+
     # Capability Filtering
 
     def get_by_capability(
@@ -58,5 +59,5 @@ class CapabilityRegistry:
                 candidate for candidate in candidates
                 if candidate.privacy_level == privacy_constraint
             ]
-        
+
         return candidates

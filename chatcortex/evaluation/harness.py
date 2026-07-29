@@ -14,10 +14,10 @@ class EvaluationResult:
         self.task_name = task_name
         self.synthesizer_name = synthesizer_name
         self.runs = []
-    
+
     def add_run(self, summary: Dict):
         self.runs.append(summary)
-    
+
     def aggregate(self) -> Dict:
         total_runs = len(self.runs)
 
@@ -33,7 +33,7 @@ class EvaluationResult:
             "avg_latency": avg_latency,
             "success_rate": success_rate,
         }
-    
+
 
 class EvaluationHarness:
     """
@@ -55,7 +55,7 @@ class EvaluationHarness:
         self.base_seed = base_seed
 
     def run(self) -> List[EvaluationResult]:
-        
+
         results = []
 
         for task_name, task in self.tasks.items():
@@ -63,16 +63,21 @@ class EvaluationHarness:
 
                 result = EvaluationResult(task_name, synthesizer_name)
 
-                # Build architecture once per experiment
-                graph = synthesizer.synthesize(task)
+                # Build architecture once per experiment.
+                # Synthesizers return a list of Pareto-optimal candidates;
+                # evaluate the first (lowest-cost) one.
+                candidates = synthesizer.synthesize(task)
+                if not candidates:
+                    continue
+                graph = min(candidates, key=lambda c: c.total_cost).graph
 
                 for run_idx in range(self.runs_per_experiment):
-                    
+
                     # Create deterministic but varying seeds
                     seed = None
                     if self.base_seed is not None:
                         seed = self.base_seed + run_idx
-                    
+
                     executor = AgentExecutor(
                         mode=self.execution_mode,
                         seed=seed
@@ -82,9 +87,9 @@ class EvaluationHarness:
                     summary = execution_result.summary()
 
                     result.add_run(summary)
-                
+
                 results.append(result)
-        
+
         return results
 
 

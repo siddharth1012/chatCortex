@@ -1,11 +1,11 @@
 from typing import List, Optional
+
+from chatcortex.graph.agent_graph import AgentGraph
 from chatcortex.optimization.architecture_candidate import ArchitectureCandidate
-from chatcortex.registry.capability_registry import CapabilityRegistry
 from chatcortex.registry.metadata import ComponentMetadata
 from chatcortex.synthesis.base import Synthesizer
 from chatcortex.synthesis.budget import BudgetExceeded, SynthesisBudget, SynthesisContext
 from chatcortex.synthesis.task_specification import TaskSpecification
-from chatcortex.graph.agent_graph import AgentGraph
 
 
 class SynthesisError(Exception):
@@ -15,7 +15,7 @@ class SynthesisError(Exception):
 class HeuristicSynthesizer(Synthesizer):
     """
     Deterministic greedy synthesizer
-    
+
     v0.3.0:
         - Budget-aware
         - Returns ArchitectureCandidate
@@ -34,13 +34,13 @@ class HeuristicSynthesizer(Synthesizer):
             + weights["latency"] * meta.avg_latency_ms
             - weights["error"] * meta.reliability_score
         )
-    
+
     def synthesize(
-        self, 
+        self,
         task: TaskSpecification,
         budget: Optional[SynthesisBudget] = None,
     ) -> List[ArchitectureCandidate]:
-        
+
         task.validate()
 
         context = SynthesisContext(budget)
@@ -59,7 +59,7 @@ class HeuristicSynthesizer(Synthesizer):
                 raise SynthesisError(
                     f"No Components available for capability '{capability}' under given constraints"
                 )
-            
+
             candidates_sorted = sorted(
                 candidates,
                 key=lambda candidate: self._score(candidate, task.objective_weights)
@@ -67,19 +67,19 @@ class HeuristicSynthesizer(Synthesizer):
 
             selected_candidate = candidates_sorted[0]
             node_id = f"{selected_candidate.name}_{idx}"
-            
+
             graph.add_component(node_id, selected_candidate)
 
             if previous_node:
                 graph.add_edge(previous_node, node_id)
-            
+
             previous_node = node_id
-        
+
         try:
             context.register_evaluation()
         except BudgetExceeded:
             return []
-        
+
         # Compute metrics
 
         total_cost = graph.total_cost()
@@ -91,21 +91,20 @@ class HeuristicSynthesizer(Synthesizer):
         if task.max_cost is not None:
             if graph.total_cost() > task.max_cost:
                 raise SynthesisError(
-                    f"Constructed agent exceeds max_cost constraint"
+                    "Constructed agent exceeds max_cost constraint"
                 )
-        
+
         if task.max_latency is not None:
             if graph.total_latency() > task.max_latency:
                 raise SynthesisError(
-                    f"Constructed agent exceeds max_latency constraint"
+                    "Constructed agent exceeds max_latency constraint"
                 )
-        
+
         candidate = ArchitectureCandidate(
             graph=graph,
             total_cost=total_cost,
             total_latency=total_latency,
             total_reliability=total_reliability,
         )
-        
+
         return [candidate]
-        

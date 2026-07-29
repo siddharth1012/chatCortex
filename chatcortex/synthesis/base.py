@@ -14,7 +14,7 @@ class Synthesizer(ABC):
     Define the formal contract:
         S_B(Task) -> Approximate Pareto Set
 
-    Where: 
+    Where:
         - Task Specification defines constraints and objectives
         - SynthesisBudget constrains computational resources
         - Output is a list of ArchitectureCandidate objects
@@ -22,7 +22,7 @@ class Synthesizer(ABC):
 
     def __init__(self, registry: CapabilityRegistry):
         self.registry = registry
-    
+
     @abstractmethod
     def synthesize(
         self,
@@ -33,7 +33,7 @@ class Synthesizer(ABC):
         Perform synthesis under optional computational budget
 
         returns:
-            - A list of ArchitectureCandidate objects representing 
+            - A list of ArchitectureCandidate objects representing
             an approximate or exact pareto frontier
         """
         pass
