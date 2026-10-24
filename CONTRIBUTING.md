@@ -68,6 +68,13 @@ fix: correct hypervolume computation
 docs: update architecture documentation
 ```
 
+### Commit message policy
+
+Commit and tag messages must contain no attribution footers or trailers
+— no "Generated with ..." lines, no emoji footer, and no `Co-Authored-By`
+lines (including any AI tooling). A commit message ends at its body's
+last line.
+
 ## Research Contributions
 
 ChatCortex welcomes contributions related to:
