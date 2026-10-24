@@ -24,6 +24,7 @@ are ignored rather than raising.
 """
 
 import dataclasses
+import math
 from collections import defaultdict
 from typing import Dict, List
 
@@ -60,7 +61,8 @@ def calibrate(
             ``cost``, and ``success`` keys.
         alpha: Blend weight on the empirical values, in ``[0, 1]``; 0
             keeps the priors, 1 replaces them, the default 0.3 leans
-            toward the declared values.
+            toward the declared values. Non-finite values are rejected
+            like any out-of-range value.
 
     Returns:
         A NEW registry; the input registry and its frozen metadata are
@@ -72,9 +74,11 @@ def calibrate(
         shared unchanged.
 
     Raises:
-        ValueError: If ``alpha`` is outside ``[0.0, 1.0]``.
+        ValueError: If ``alpha`` is outside ``[0.0, 1.0]`` or not finite.
     """
-    if alpha < 0.0 or alpha > 1.0:
+    # NaN passes naive range comparisons, so a missing finite check would
+    # let NaN flow into metadata and propagate silently through blends.
+    if not math.isfinite(alpha) or alpha < 0.0 or alpha > 1.0:
         raise ValueError(f"alpha must be in [0.0, 1.0], {alpha!r} given")
 
     all_metadata = registry.list_all()

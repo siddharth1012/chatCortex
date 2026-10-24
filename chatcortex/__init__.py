@@ -13,10 +13,12 @@ Core capabilities include:
 """
 
 from .graph.agent_graph import AgentGraph
+from .loop import LoopIteration, run_closed_loop
 from .registry.capability_registry import CapabilityRegistry
 from .registry.demo_components import build_demo_registry
 from .registry.loader import load_registry
 from .registry.metadata import ComponentMetadata
+from .registry.package import RegistryReport, save_registry, validate_registry_file
 from .synthesis.beam_synthesizer import BeamSynthesizer
 from .synthesis.budget import SynthesisBudget
 from .synthesis.exhaustive_synthesizer import ExhaustiveSynthesizer
@@ -39,9 +41,14 @@ __all__ = [
     "SynthesisBudget",
     "AgentGraph",
     "CapabilityRegistry",
+    "LoopIteration",
     "ComponentMetadata",
     "build_demo_registry",
     "load_registry",
+    "run_closed_loop",
+    "save_registry",
+    "validate_registry_file",
+    "RegistryReport",
 ]
 
-__version__ = "0.6.0"
+__version__ = "0.7.0"

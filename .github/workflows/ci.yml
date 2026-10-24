@@ -38,3 +38,11 @@ jobs:
 
       - name: Run registry_from_json example
         run: python examples/registry_from_json.py
+
+      - name: Run closed loop example (simulated)
+        run: python examples/closed_loop.py
+
+      - name: Run closed loop real-backend example (keyless path)
+        env:
+          OPENAI_API_KEY: ""
+        run: python examples/closed_loop_real.py

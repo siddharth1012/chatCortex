@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.7.0] - 2026-10-24
+
+### Added
+- **The closed loop** — `chatcortex.loop.run_closed_loop(registry, task, synthesizer, executor, iterations, alpha)` drives synthesize → execute → calibrate → re-synthesize as a library API, returning per-iteration `LoopIteration` records (frontier size and objective ranges, probes executed, calibrated registry snapshot; JSON-serializable and deterministic for a seed). The synthesizer is passed as a class or factory — pre-built instances are rejected, because a loop calibrated against a stale registry is not a loop that learns. Executor-composition with an `ExecutionProtocol` backend is covered by tests: measured latency/cost (not declared values) drive calibration
+- `examples/closed_loop.py` — the flagship demo (4 iterations, no API keys, runs in CI). Measured run (alpha=0.4, seed 42): frontier breathes 15 → 18 → 14 → 16 architectures as calibrated metadata reshapes the search, and reliability moves from declared priors to empirical values — `retrieval_speedster` 0.78 → 0.53, `retrieval_budget` 0.82 → 0.93, `generation_reliable` 0.98 → 0.997, `verification_balanced` 0.92 → 0.94
+- `examples/closed_loop_real.py` — the same loop against real OpenAI chat-completions backends (`chatcortex[real]` + `OPENAI_API_KEY`); without a key it prints a setup card and exits 0 so secretless CI stays green
+- **Registry packs** — `save_registry(registry, path)` writes the loader's document shape (no new schema fields) and proves the round-trip by reloading; `validate_registry_file(path)` returns a structured `RegistryReport` (component count, per-row field issues in loader style, duplicate names) without raising, collecting every broken row in one pass. New console script: `chatcortex-registry validate <file>` (exit 0 only when the pack fully validates)
+- README: closed-loop headline grounded in the measured demo numbers, a Registry packs section with copy-pasteable snippets, quickstart wiring for both closed-loop examples; GitHub repo description and topics updated to match
+
+### Verification
+- `scripts/regenerate_benchmarks.py` re-run on the shipped core: every coverage, hypervolume-loss, and regret row in `docs/benchmark_results.json` reproduces byte-for-byte against 0.6.0 (`git diff` empty) — no search-behavior regression
+- Full pytest suite green (143 tests), ruff clean, all four examples run keyless end-to-end plus the keyless real-backend path
+
 ## [0.6.0] - 2026-10-24
 
 ### Added
