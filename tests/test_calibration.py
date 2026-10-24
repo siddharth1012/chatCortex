@@ -171,3 +171,13 @@ def test_alpha_out_of_bounds_raises():
         calibrate(registry, [], alpha=1.5)
     with pytest.raises(ValueError):
         calibrate(registry, [], alpha=-0.1)
+
+
+def test_alpha_nonfinite_raises_instead_of_silent_nan_metadata():
+    """NaN passes naive range comparisons (<, >); without an explicit
+    finite check it would blend NaN reliability/latency/cost straight into
+    the registry."""
+    registry = make_registry()
+    for alpha in (float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError):
+            calibrate(registry, [], alpha=alpha)

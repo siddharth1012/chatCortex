@@ -266,6 +266,8 @@ def test_loop_rejects_bad_inputs_before_any_execution():
         {"candidates_per_iteration": -3},
         {"alpha": -0.1},
         {"alpha": 1.5},
+        {"alpha": float("nan")},  # passes naive range checks
+        {"alpha": float("inf")},
     ):
         with pytest.raises(ValueError) as raised:
             run_closed_loop(

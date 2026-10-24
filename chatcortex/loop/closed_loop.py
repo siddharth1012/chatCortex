@@ -26,6 +26,7 @@ compound toward empirical values across iterations at roughly
 ``1 - (1 - alpha) ** k`` after ``k`` iterations.
 """
 
+import math
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Optional, Union
 
@@ -121,7 +122,8 @@ def run_closed_loop(
             which keeps the whole run deterministic.
         iterations: How many loop rounds to run (>= 1).
         alpha: Blend weight passed to :func:`calibrate`; validated, so
-            every round only executes under a valid blend.
+            every round only executes under a valid blend. Non-finite
+            values are rejected like any out-of-range value.
         candidates_per_iteration: Execute only the first ``N`` frontier
             members (objective-sorted, deterministic) instead of all of
             them; useful when executions are expensive. Must be ``>= 1``
@@ -154,7 +156,7 @@ def run_closed_loop(
             "candidates_per_iteration must be >= 1 when given, "
             f"{candidates_per_iteration} given"
         )
-    if alpha < 0.0 or alpha > 1.0:
+    if not math.isfinite(alpha) or alpha < 0.0 or alpha > 1.0:
         raise ValueError(f"alpha must be in [0.0, 1.0], {alpha!r} given")
 
     records: List[LoopIteration] = []
