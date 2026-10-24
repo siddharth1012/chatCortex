@@ -64,6 +64,13 @@ Or run the full demo comparing three synthesis strategies:
 python examples/quickstart.py
 ```
 
+To see the full loop — load a JSON registry, synthesize a frontier, execute one
+architecture, and calibrate the registry's metadata from real telemetry — run:
+
+```bash
+python examples/registry_from_json.py
+```
+
 To search over your own components, build a `CapabilityRegistry` and register
 `ComponentMetadata` describing each model, tool, or verifier — see
 `examples/` for complete walkthroughs.
@@ -118,8 +125,8 @@ If you use ChatCortex in your research, please cite it (see [CITATION.cff](CITAT
 - [x] Exact Pareto frontier computation (exhaustive search)
 - [x] Budget-aware beam search with Pareto pruning and progressive widening
 - [ ] Graph-structured (non-chain) agent synthesis
-- [ ] Real model / tool integrations
-- [ ] Registry loading from YAML/JSON
+- [ ] Real model / tool integrations (OpenAI chat-completions backend already available behind the `chatcortex[real]` extra; more backends planned)
+- [x] Registry loading from JSON (`load_registry`, with error messages naming the failing field); YAML planned
 
 ## Status
 

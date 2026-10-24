@@ -76,6 +76,14 @@ The registry supports:
 * constraint filtering
 * component discovery
 
+Registries can also be materialized from a JSON document with
+**`load_registry(path)`** (`chatcortex.registry.loader`). Every row is
+validated — costs, latency, and the reliability range; component type,
+privacy, and capability vocabulary — and validation failures name the
+row and field (e.g. `components[2].reliability_score out of range`).
+`CapabilityRegistry.to_dict()` emits the same document shape, so
+registries round-trip through JSON.
+
 Importantly, the registry **does not perform optimization**. It simply exposes valid components to the synthesis engine.
 
 ---
@@ -119,6 +127,9 @@ Width-constrained architecture search.
 ExhaustiveSynthesizer
 Enumerates the full architecture space to compute the exact Pareto frontier.
 
+ParetoPartialBeamSynthesizer
+Beam search whose stage truncation keeps only Pareto-non-dominated partials, always retaining the cost, latency, and reliability extremes and filling remaining slots by crowding distance in objective space.
+
 ProgressiveParetoBeamSynthesizer
 Introduces depth-aware beam widening to mitigate early-stage pruning bias.
 
@@ -138,6 +149,13 @@ Each component succeeds with probability equal to its reliability score.
 
 This allows empirical evaluation of system robustness.
 
+Optionally, `AgentExecutor(..., backend=...)` delegates each component
+call to a real execution backend — an `openai`-SDK chat-completions
+adapter ships behind the `chatcortex[real]` extra (see
+`ExecutionProtocol`). With a backend set, telemetry records the
+backend's *measured* latency, cost, and success instead of simulated
+values, and the chain still stops on the first failing component.
+
 ---
 
 # Telemetry
@@ -150,6 +168,18 @@ Execution traces capture:
 * success/failure status
 
 These logs support detailed experimental analysis.
+
+**Trace calibration** closes the loop:
+`chatcortex.telemetry.calibration.calibrate(registry, records, alpha)`
+blends empirical success/latency/cost from recorded traces back into a
+*new* immutable registry via `CapabilityRegistry.update()`:
+
+```
+new = alpha * empirical + (1 - alpha) * prior
+```
+
+Components without traces keep their declared priors, so the calibrated
+registry can feed straight back into synthesis.
 
 ---
 
