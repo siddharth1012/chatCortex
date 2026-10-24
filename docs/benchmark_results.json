@@ -1,0 +1,486 @@
+{
+  "meta": {
+    "chatcortex_version": "0.6.0",
+    "python": "3.10.4",
+    "stage_setup": "5-stage demo registry, 4 variants per capability (4**5 = 1024 candidate chains)",
+    "exact_frontier_size": 27,
+    "reference_point": [
+      0.1,
+      3000,
+      0.0
+    ],
+    "monte_carlo_samples": 200000,
+    "regeneration": "python scripts/regenerate_benchmarks.py",
+    "budget_sweep": {
+      "budgets": [
+        20,
+        40,
+        80,
+        120,
+        180
+      ],
+      "beam_width": 7,
+      "seeds": [
+        42,
+        43,
+        44,
+        45,
+        46
+      ]
+    },
+    "width_sweep": {
+      "widths": [
+        3,
+        5,
+        7,
+        10,
+        15
+      ],
+      "budget": 120
+    }
+  },
+  "budget_sweep": [
+    {
+      "algorithm": "Greedy",
+      "budget": 20,
+      "beam_width": null,
+      "coverage": 0.037037037037037035,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 115.59899999999999,
+      "avg_cost_regret": 0.0,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.0
+    },
+    {
+      "algorithm": "Random",
+      "budget": 20,
+      "beam_width": null,
+      "coverage": 0.037037037037037035,
+      "coverage_std": 0.026189140043946204,
+      "hypervolume_loss": 43.24799999999999,
+      "avg_cost_regret": 0.001716666666666668,
+      "avg_latency_regret": 63.63636363636364,
+      "avg_reliability_regret": 0.018610605774545527
+    },
+    {
+      "algorithm": "ScalarBeam",
+      "budget": 20,
+      "beam_width": 7,
+      "coverage": 0.14814814814814814,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 75.7605,
+      "avg_cost_regret": 6.938893903907229e-19,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 2.2204460492503132e-17
+    },
+    {
+      "algorithm": "ParetoPartialBeam",
+      "budget": 20,
+      "beam_width": 7,
+      "coverage": 0.3333333333333333,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 6.9059999999999775,
+      "avg_cost_regret": 0.0009684210526315789,
+      "avg_latency_regret": 37.89473684210526,
+      "avg_reliability_regret": 0.014324662736842127
+    },
+    {
+      "algorithm": "ProgressiveParetoBeam",
+      "budget": 20,
+      "beam_width": 7,
+      "coverage": 0.7407407407407407,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 38.22149999999999,
+      "avg_cost_regret": 0.0,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.0
+    },
+    {
+      "algorithm": "Greedy",
+      "budget": 40,
+      "beam_width": null,
+      "coverage": 0.037037037037037035,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 115.59899999999999,
+      "avg_cost_regret": 0.0,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.0
+    },
+    {
+      "algorithm": "Random",
+      "budget": 40,
+      "beam_width": null,
+      "coverage": 0.1111111111111111,
+      "coverage_std": 0.037037037037037035,
+      "hypervolume_loss": 28.483499999999985,
+      "avg_cost_regret": 0.0011499366515837117,
+      "avg_latency_regret": 57.085972850678736,
+      "avg_reliability_regret": 0.015249323379708444
+    },
+    {
+      "algorithm": "ScalarBeam",
+      "budget": 40,
+      "beam_width": 7,
+      "coverage": 0.18518518518518517,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 68.4,
+      "avg_cost_regret": 0.0005000000000000007,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.006766968000000026
+    },
+    {
+      "algorithm": "ParetoPartialBeam",
+      "budget": 40,
+      "beam_width": 7,
+      "coverage": 0.3333333333333333,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 6.9059999999999775,
+      "avg_cost_regret": 0.0009684210526315789,
+      "avg_latency_regret": 37.89473684210526,
+      "avg_reliability_regret": 0.014324662736842127
+    },
+    {
+      "algorithm": "ProgressiveParetoBeam",
+      "budget": 40,
+      "beam_width": 7,
+      "coverage": 1.0,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 0.0,
+      "avg_cost_regret": 0.0,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.0
+    },
+    {
+      "algorithm": "Greedy",
+      "budget": 80,
+      "beam_width": null,
+      "coverage": 0.037037037037037035,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 115.59899999999999,
+      "avg_cost_regret": 0.0,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.0
+    },
+    {
+      "algorithm": "Random",
+      "budget": 80,
+      "beam_width": null,
+      "coverage": 0.19999999999999998,
+      "coverage_std": 0.05616944773371518,
+      "hypervolume_loss": 20.194200000000002,
+      "avg_cost_regret": 0.0007522953216374281,
+      "avg_latency_regret": 49.36842105263158,
+      "avg_reliability_regret": 0.011821485246315834
+    },
+    {
+      "algorithm": "ScalarBeam",
+      "budget": 80,
+      "beam_width": 7,
+      "coverage": 0.18518518518518517,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 68.4,
+      "avg_cost_regret": 0.0005000000000000007,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.006766968000000026
+    },
+    {
+      "algorithm": "ParetoPartialBeam",
+      "budget": 80,
+      "beam_width": 7,
+      "coverage": 0.3333333333333333,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 6.9059999999999775,
+      "avg_cost_regret": 0.0009684210526315789,
+      "avg_latency_regret": 37.89473684210526,
+      "avg_reliability_regret": 0.014324662736842127
+    },
+    {
+      "algorithm": "ProgressiveParetoBeam",
+      "budget": 80,
+      "beam_width": 7,
+      "coverage": 1.0,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 0.0,
+      "avg_cost_regret": 0.0,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.0
+    },
+    {
+      "algorithm": "Greedy",
+      "budget": 120,
+      "beam_width": null,
+      "coverage": 0.037037037037037035,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 115.59899999999999,
+      "avg_cost_regret": 0.0,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.0
+    },
+    {
+      "algorithm": "Random",
+      "budget": 120,
+      "beam_width": null,
+      "coverage": 0.3111111111111111,
+      "coverage_std": 0.03312693299999688,
+      "hypervolume_loss": 18.993599999999994,
+      "avg_cost_regret": 0.0005596912280701764,
+      "avg_latency_regret": 41.933233082706764,
+      "avg_reliability_regret": 0.008900180873688258
+    },
+    {
+      "algorithm": "ScalarBeam",
+      "budget": 120,
+      "beam_width": 7,
+      "coverage": 0.18518518518518517,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 68.4,
+      "avg_cost_regret": 0.0005000000000000007,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.006766968000000026
+    },
+    {
+      "algorithm": "ParetoPartialBeam",
+      "budget": 120,
+      "beam_width": 7,
+      "coverage": 0.3333333333333333,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 6.9059999999999775,
+      "avg_cost_regret": 0.0009684210526315789,
+      "avg_latency_regret": 37.89473684210526,
+      "avg_reliability_regret": 0.014324662736842127
+    },
+    {
+      "algorithm": "ProgressiveParetoBeam",
+      "budget": 120,
+      "beam_width": 7,
+      "coverage": 1.0,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 0.0,
+      "avg_cost_regret": 0.0,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.0
+    },
+    {
+      "algorithm": "Greedy",
+      "budget": 180,
+      "beam_width": null,
+      "coverage": 0.037037037037037035,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 115.59899999999999,
+      "avg_cost_regret": 0.0,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.0
+    },
+    {
+      "algorithm": "Random",
+      "budget": 180,
+      "beam_width": null,
+      "coverage": 0.3925925925925926,
+      "coverage_std": 0.10670266882139211,
+      "hypervolume_loss": 16.75829999999999,
+      "avg_cost_regret": 0.0004206211180124231,
+      "avg_latency_regret": 31.54658385093168,
+      "avg_reliability_regret": 0.007135801782857171
+    },
+    {
+      "algorithm": "ScalarBeam",
+      "budget": 180,
+      "beam_width": 7,
+      "coverage": 0.18518518518518517,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 68.4,
+      "avg_cost_regret": 0.0005000000000000007,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.006766968000000026
+    },
+    {
+      "algorithm": "ParetoPartialBeam",
+      "budget": 180,
+      "beam_width": 7,
+      "coverage": 0.3333333333333333,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 6.9059999999999775,
+      "avg_cost_regret": 0.0009684210526315789,
+      "avg_latency_regret": 37.89473684210526,
+      "avg_reliability_regret": 0.014324662736842127
+    },
+    {
+      "algorithm": "ProgressiveParetoBeam",
+      "budget": 180,
+      "beam_width": 7,
+      "coverage": 1.0,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 0.0,
+      "avg_cost_regret": 0.0,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.0
+    }
+  ],
+  "width_sweep": [
+    {
+      "algorithm": "ScalarBeam",
+      "budget": 120,
+      "beam_width": 3,
+      "coverage": 0.18518518518518517,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 83.9265,
+      "avg_cost_regret": 0.0006666666666666666,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.0076496160000000075
+    },
+    {
+      "algorithm": "ParetoPartialBeam",
+      "budget": 120,
+      "beam_width": 3,
+      "coverage": 0.2222222222222222,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 23.255999999999972,
+      "avg_cost_regret": 0.0008000000000000008,
+      "avg_latency_regret": 60.0,
+      "avg_reliability_regret": 0.010933301866666722
+    },
+    {
+      "algorithm": "ProgressiveParetoBeam",
+      "budget": 120,
+      "beam_width": 3,
+      "coverage": 0.8518518518518519,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 1.9694999999999823,
+      "avg_cost_regret": 0.0003714285714285712,
+      "avg_latency_regret": 25.714285714285715,
+      "avg_reliability_regret": 0.007474195657142857
+    },
+    {
+      "algorithm": "ScalarBeam",
+      "budget": 120,
+      "beam_width": 5,
+      "coverage": 0.18518518518518517,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 83.9265,
+      "avg_cost_regret": 0.0006666666666666666,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.0076496160000000075
+    },
+    {
+      "algorithm": "ParetoPartialBeam",
+      "budget": 120,
+      "beam_width": 5,
+      "coverage": 0.25925925925925924,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 13.265999999999991,
+      "avg_cost_regret": 0.001431578947368422,
+      "avg_latency_regret": 44.21052631578947,
+      "avg_reliability_regret": 0.012986587789473737
+    },
+    {
+      "algorithm": "ProgressiveParetoBeam",
+      "budget": 120,
+      "beam_width": 5,
+      "coverage": 1.0,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 0.0,
+      "avg_cost_regret": 0.0,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.0
+    },
+    {
+      "algorithm": "ScalarBeam",
+      "budget": 120,
+      "beam_width": 7,
+      "coverage": 0.18518518518518517,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 68.4,
+      "avg_cost_regret": 0.0005000000000000007,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.006766968000000026
+    },
+    {
+      "algorithm": "ParetoPartialBeam",
+      "budget": 120,
+      "beam_width": 7,
+      "coverage": 0.3333333333333333,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 6.9059999999999775,
+      "avg_cost_regret": 0.0009684210526315789,
+      "avg_latency_regret": 37.89473684210526,
+      "avg_reliability_regret": 0.014324662736842127
+    },
+    {
+      "algorithm": "ProgressiveParetoBeam",
+      "budget": 120,
+      "beam_width": 7,
+      "coverage": 1.0,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 0.0,
+      "avg_cost_regret": 0.0,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.0
+    },
+    {
+      "algorithm": "ScalarBeam",
+      "budget": 120,
+      "beam_width": 10,
+      "coverage": 0.25925925925925924,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 68.4,
+      "avg_cost_regret": 0.0004999999999999996,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.006766967999999984
+    },
+    {
+      "algorithm": "ParetoPartialBeam",
+      "budget": 120,
+      "beam_width": 10,
+      "coverage": 0.6296296296296297,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 0.10050000000001091,
+      "avg_cost_regret": 2.365532012695646e-19,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 1.766263902812749e-17
+    },
+    {
+      "algorithm": "ProgressiveParetoBeam",
+      "budget": 120,
+      "beam_width": 10,
+      "coverage": 1.0,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 0.0,
+      "avg_cost_regret": 0.0,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.0
+    },
+    {
+      "algorithm": "ScalarBeam",
+      "budget": 120,
+      "beam_width": 15,
+      "coverage": 0.25925925925925924,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 68.4,
+      "avg_cost_regret": 0.0004999999999999996,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.006766967999999984
+    },
+    {
+      "algorithm": "ParetoPartialBeam",
+      "budget": 120,
+      "beam_width": 15,
+      "coverage": 0.8518518518518519,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 0.013499999999993406,
+      "avg_cost_regret": 0.0,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 2.3129646346357427e-18
+    },
+    {
+      "algorithm": "ProgressiveParetoBeam",
+      "budget": 120,
+      "beam_width": 15,
+      "coverage": 1.0,
+      "coverage_std": 0.0,
+      "hypervolume_loss": 0.0,
+      "avg_cost_regret": 0.0,
+      "avg_latency_regret": 0.0,
+      "avg_reliability_regret": 0.0
+    }
+  ]
+}
