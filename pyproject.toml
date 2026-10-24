@@ -64,6 +64,9 @@ Homepage = "https://github.com/siddharth1012/chatCortex"
 Repository = "https://github.com/siddharth1012/chatCortex"
 Issues = "https://github.com/siddharth1012/chatCortex/issues"
 
+[project.scripts]
+chatcortex-registry = "chatcortex.registry.cli:main"
+
 # -----------------------------
 # setuptools configuration
 # -----------------------------

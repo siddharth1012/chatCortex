@@ -82,7 +82,13 @@ validated — costs, latency, and the reliability range; component type,
 privacy, and capability vocabulary — and validation failures name the
 row and field (e.g. `components[2].reliability_score out of range`).
 `CapabilityRegistry.to_dict()` emits the same document shape, so
-registries round-trip through JSON.
+registries round-trip through JSON. They also ship as packs:
+`save_registry(registry, path)` (`chatcortex.registry.package`) writes
+that same shape and proves the round-trip by reloading the file, and
+`validate_registry_file(path)` returns a structured report — component
+count, per-row field issues, duplicate names — without raising. The
+`chatcortex-registry validate <file>` console command wraps the report,
+exiting 0 only for a fully valid pack.
 
 Importantly, the registry **does not perform optimization**. It simply exposes valid components to the synthesis engine.
 
