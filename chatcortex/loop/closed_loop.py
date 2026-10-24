@@ -120,7 +120,12 @@ def run_closed_loop(
             backend-backed); its seeded RNG advances across iterations,
             which keeps the whole run deterministic.
         iterations: How many loop rounds to run (>= 1).
-        alpha: Blend weight passed to :func:`calibrate`.
+        alpha: Blend weight passed to :func:`calibrate`; validated, so
+            every round only executes under a valid blend.
+        candidates_per_iteration: Execute only the first ``N`` frontier
+            members (objective-sorted, deterministic) instead of all of
+            them; useful when executions are expensive. Must be ``>= 1``
+            when given, and is validated before anything executes.
         budget: Optional per-iteration :class:`SynthesisBudget`; it is a
             frozen dataclass, so the same constraints apply every round
             without state leaking between iterations.
@@ -135,13 +140,22 @@ def run_closed_loop(
         ``registry`` is the registry calibrated *during* round ``k``.
 
     Raises:
-        ValueError: If ``iterations < 1`` or a round synthesizes an empty
-            frontier (nothing to execute would stall the loop).
+        ValueError: If ``iterations < 1``, ``alpha`` is outside ``[0, 1]``,
+            or ``candidates_per_iteration`` is given below 1 — all before
+            any round runs — or if a round synthesizes an empty frontier
+            (nothing to execute would stall the loop).
         TypeError: If ``synthesizer`` is neither a Synthesizer subclass
             nor a factory callable.
     """
     if iterations < 1:
         raise ValueError(f"iterations must be >= 1, {iterations} given")
+    if candidates_per_iteration is not None and candidates_per_iteration < 1:
+        raise ValueError(
+            "candidates_per_iteration must be >= 1 when given, "
+            f"{candidates_per_iteration} given"
+        )
+    if alpha < 0.0 or alpha > 1.0:
+        raise ValueError(f"alpha must be in [0.0, 1.0], {alpha!r} given")
 
     records: List[LoopIteration] = []
     current = registry

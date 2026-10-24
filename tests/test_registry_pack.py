@@ -126,3 +126,13 @@ def test_cli_argparse_errors_exit_nonzero(tmp_path):
         cli_main(["validate", str(tmp_path / "nope.json"), "--extra"])
     # argparse exits with status 2 on usage errors, never silently.
     assert exc.value.code != 0
+
+
+def test_validate_reports_unreadable_bytes_instead_of_raising(tmp_path):
+    """Invalid UTF-8 is a read problem: one issue, no exception."""
+    path = tmp_path / "not_utf8.json"
+    path.write_bytes(b'{"components": [{"name": "\xff\xfe\x9d"}]}')
+
+    report = validate_registry_file(path)  # must not raise
+    assert report.valid is False
+    assert len(report.issues) == 1 and "Cannot read" in report.issues[0]

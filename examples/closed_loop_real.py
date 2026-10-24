@@ -34,7 +34,7 @@ SETUP_CARD = """
 OpenAIBackend needs one thing this environment does not have yet:
 
   1. pip install "chatcortex[real]"     # the openai SDK is optional
-  2. export OPENAI_API_KEY=sk-...       # https://freebuff.com/account/api
+  2. export OPENAI_API_KEY=sk-...       # https://platform.openai.com/api-keys
   3. python examples/closed_loop_real.py
 
 Until then, run the offline flagship instead:
@@ -49,9 +49,10 @@ def _backend_or_none():
         return None
     try:
         from chatcortex.adapters.openai_backend import OpenAIBackend
+
+        return OpenAIBackend()  # __init__ lazy-imports `openai` (the extra)
     except ImportError:
         return None
-    return OpenAIBackend()
 
 
 def main():

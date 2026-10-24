@@ -243,3 +243,39 @@ def test_loop_composes_with_execution_backend():
     assert final.avg_latency_ms == pytest.approx(
         c1 * (1 - ALPHA / 2), abs=1e-9
     )
+
+
+def test_loop_rejects_bad_inputs_before_any_execution():
+    """candidates_per_iteration and alpha are validated up front: no round
+    synthesizes, and in particular nothing ever executes against a real
+    backend under settings that would stall or mis-calibrate."""
+    from chatcortex.execution.executor import ProbeResult
+
+    class CountingBackend:
+        def __init__(self):
+            self.calls = 0
+
+        def __call__(self, metadata, node_input=None):
+            self.calls += 1
+            return ProbeResult(True, 1.0, 0.0, "ok")
+
+    backend = CountingBackend()
+    registry, task = _demo_setup()
+    for kwargs in (
+        {"candidates_per_iteration": 0},
+        {"candidates_per_iteration": -3},
+        {"alpha": -0.1},
+        {"alpha": 1.5},
+    ):
+        with pytest.raises(ValueError) as raised:
+            run_closed_loop(
+                registry=registry,
+                task=task,
+                synthesizer=BeamSynthesizer,
+                executor=AgentExecutor(backend=backend),
+                iterations=2,
+                alpha=kwargs.pop("alpha", 0.5),
+                **kwargs,
+            )
+        assert "given" in str(raised.value)
+        assert backend.calls == 0  # validation preceded every execution

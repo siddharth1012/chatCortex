@@ -115,7 +115,7 @@ def validate_registry_file(path: Union[str, Path]) -> RegistryReport:
 
     try:
         text = file_path.read_text(encoding="utf-8")
-    except OSError as exc:
+    except (OSError, UnicodeDecodeError) as exc:
         report.issues.append(f"Cannot read registry file {file_path}: {exc}")
         return report
 
