@@ -2,6 +2,7 @@ import random
 from typing import List
 
 from chatcortex.graph.agent_graph import AgentGraph
+from chatcortex.graph.node_ids import node_id_for
 from chatcortex.optimization.architecture_candidate import ArchitectureCandidate
 from chatcortex.optimization.pareto import ParetoSet
 from chatcortex.synthesis.base import Synthesizer
@@ -68,7 +69,7 @@ class RandomSynthesizer(Synthesizer):
 
             for idx, candidates in enumerate(candidates_list):
                 component = random_number_generation.choice(candidates)
-                node_id = f"{component.name}_{idx}"
+                node_id = node_id_for(component.name, idx)
                 graph.add_component(node_id, component)
 
                 if previous_node:
