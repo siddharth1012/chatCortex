@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chatcortex"
-version = "0.4.0"
+version = "0.6.0"
 description = "Framework for multi-objective synthesis and optimization of AI agent architectures under bounded evaluation budgets"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -34,13 +34,13 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Software Development :: Libraries"
 ]
 
 dependencies = [
-    "networkx>=2.8",
-    "numpy>=1.23"
+    "networkx>=2.8"
 ]
 
 [project.optional-dependencies]
@@ -53,6 +53,10 @@ dev = [
 
 viz = [
     "matplotlib>=3.7"
+]
+
+real = [
+    "openai>=2.48"
 ]
 
 [project.urls]

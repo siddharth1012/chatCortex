@@ -15,6 +15,7 @@ Core capabilities include:
 from .graph.agent_graph import AgentGraph
 from .registry.capability_registry import CapabilityRegistry
 from .registry.demo_components import build_demo_registry
+from .registry.loader import load_registry
 from .registry.metadata import ComponentMetadata
 from .synthesis.beam_synthesizer import BeamSynthesizer
 from .synthesis.budget import SynthesisBudget
@@ -40,6 +41,7 @@ __all__ = [
     "CapabilityRegistry",
     "ComponentMetadata",
     "build_demo_registry",
+    "load_registry",
 ]
 
-__version__ = "0.4.0"
+__version__ = "0.6.0"

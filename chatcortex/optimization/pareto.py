@@ -53,26 +53,26 @@ def compute_pareto_front(
 
 class ParetoSet:
     """
-    Maintains a non-dominated architecture set incrementally
+    Maintains a non-dominated architecture set incrementally.
 
-    Used by:
-        - ExhaustiveSynthesizer (Optional)
-        - BeamSynthesizer
-        - EvolutionarySynthesizer
-        - Budget-aware Synthesis
+    Deterministic: metric-identical candidates are kept once, and
+    iteration yields the members sorted by objective tuple
+    (total_cost, total_latency, total_reliability).
     """
 
     def __init__(self):
-        self._set: Set[ArchitectureCandidate] = set()
+        self._entries: dict = {}  # objective tuple -> candidate
 
     def __iter__(self):
-        return iter(self._set)
+        return iter(
+            [self._entries[key] for key in sorted(self._entries)]
+        )
 
     def __len__(self):
-        return len(self._set)
+        return len(self._entries)
 
     def as_set(self) -> Set[ArchitectureCandidate]:
-        return set(self._set)
+        return set(self._entries.values())
 
     def add(self, candidate: ArchitectureCandidate) -> bool:
         """
@@ -81,21 +81,31 @@ class ParetoSet:
 
         Returns:
             - True if candidate is added,
-            - False if candidate was dominated
+            - False if it is dominated by an existing member or
+              metric-identical to one already present
         """
+
+        candidate_metrics = (
+            candidate.total_cost,
+            candidate.total_latency,
+            candidate.total_reliability,
+        )
+
+        if candidate_metrics in self._entries:
+            return False  # metric-identical: keep once
 
         to_remove = []
 
-        for existing in self._set:
+        for existing_key, existing in self._entries.items():
             if dominates(existing, candidate):
                 return False # candidate dominated by existing
             if dominates(candidate, existing):
-                to_remove.append(existing)
+                to_remove.append(existing_key)
 
         for item in to_remove:
-            self._set.remove(item)
+            del self._entries[item]
 
-        self._set.add(candidate)
+        self._entries[candidate_metrics] = candidate
 
         return True
 

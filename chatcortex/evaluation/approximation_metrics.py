@@ -1,4 +1,3 @@
-import random
 from typing import Iterable, List, Tuple
 
 from chatcortex.optimization.architecture_candidate import ArchitectureCandidate
@@ -11,13 +10,9 @@ def compute_coverage(
 ) -> float:
     return frontier_coverage(approx_frontier, true_frontier)
 
-def compute_hypervolume(
-    frontier: Iterable[ArchitectureCandidate],
-    reference_point: Tuple[float, float, float],
-) -> float:
-    return hypervolume_monte_carlo(frontier, reference_point)
 
-
+# Note: one seed per estimate, not a shared stream — the two estimates below
+# are independent Monte Carlo runs of the same algorithm.
 def hypervolume_loss(
     approx_frontier,
     true_frontier,
@@ -25,42 +20,12 @@ def hypervolume_loss(
     num_samples=200000,
     seed=42,
 ) -> float:
-    ref_cost, ref_latency, ref_reliability = reference_point
-
-    random_number_generator = random.Random(seed)
-
-    dominated_true = 0
-    dominated_approx = 0
-
-    for _ in range(num_samples):
-
-        sample_cost = random_number_generator.uniform(0, ref_cost)
-        sample_latency = random_number_generator.uniform(0, ref_latency)
-        sample_reliability = random_number_generator.uniform(ref_reliability, 1.0)
-
-        for candidate in true_frontier:
-            if (
-                candidate.total_cost <= sample_cost
-                and candidate.total_latency <= sample_latency
-                and candidate.total_reliability >= sample_reliability
-            ):
-                dominated_true += 1
-                break
-
-        for candidate in approx_frontier:
-            if (
-                candidate.total_cost <= sample_cost
-                and candidate.total_latency <= sample_latency
-                and candidate.total_reliability >= sample_reliability
-            ):
-                dominated_approx += 1
-                break
-
-
-    box_volume = ref_cost * ref_latency * (1.0 - ref_reliability)
-
-    hv_true = (dominated_true / num_samples) * box_volume
-    hv_approx = (dominated_approx / num_samples) * box_volume
+    hv_true = hypervolume_monte_carlo(
+        true_frontier, reference_point, num_samples=num_samples, seed=seed
+    )
+    hv_approx = hypervolume_monte_carlo(
+        approx_frontier, reference_point, num_samples=num_samples, seed=seed
+    )
 
     return max(0.0, hv_true - hv_approx)
 
