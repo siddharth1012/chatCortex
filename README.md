@@ -13,6 +13,8 @@ Instead of manually wiring LLM pipelines (`retrieval → LLM → verifier → to
 Task Specification → Architecture Search → Pareto-Optimal Architectures
 ```
 
+**ChatCortex is the only agent framework that re-synthesizes your architecture from what actually happened.** Execution telemetry is calibrated back into the component registry, so every new synthesis round runs against *measured* behavior instead of declared guesses. The shipped demo makes this concrete: in four closed-loop iterations, `examples/closed_loop.py` moves a component's declared reliability from 0.78 to a corrected 0.53, lifts a budget retriever from 0.82 to 0.93, and reshapes the search frontier around the values the system actually measured.
+
 ## Installation
 
 ```bash
@@ -71,9 +73,43 @@ architecture, and calibrate the registry's metadata from real telemetry — run:
 python examples/registry_from_json.py
 ```
 
+Run the flagship closed loop — synthesize → execute → calibrate →
+re-synthesize, four iterations of measured behavior flowing back into the
+registry:
+
+```bash
+python examples/closed_loop.py
+```
+
+With an OpenAI key you can run the same loop against real backends:
+
+```bash
+pip install "chatcortex[real]"
+export OPENAI_API_KEY=...   # every reply spends your credits
+python examples/closed_loop_real.py
+```
+
 To search over your own components, build a `CapabilityRegistry` and register
 `ComponentMetadata` describing each model, tool, or verifier — see
 `examples/` for complete walkthroughs.
+
+## Registry packs
+
+A registry ships as a JSON pack in the loader's document shape. Saving it
+proves the round-trip, and one command validates any pack offline:
+
+```python
+from chatcortex import build_demo_registry, save_registry, validate_registry_file
+
+save_registry(build_demo_registry(), "registry.json")  # writes, then reloads to prove it
+print(validate_registry_file("registry.json").valid)   # True
+```
+
+```bash
+chatcortex-registry validate registry.json
+#   components validated: 12
+#   result: VALID          (exit 0; issues and duplicates are named when invalid)
+```
 
 ## How It Works
 
