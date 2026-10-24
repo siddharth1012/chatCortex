@@ -195,3 +195,51 @@ def test_loop_iteration_type_is_exported():
         iterations=1,
     )
     assert isinstance(records[0], LoopIteration)
+
+
+def test_loop_composes_with_execution_backend():
+    """Executor + ExecutionProtocol inside the loop: *measured* latency
+    and cost (not the declared values) drive calibration, so both
+    actually move — which the pure simulator cannot show."""
+    from chatcortex.execution.executor import ProbeResult
+
+    class StubBackend:
+        """Half the declared latency, double the declared cost."""
+
+        def __init__(self):
+            self.calls = 0
+
+        def __call__(self, metadata, node_input=None):
+            self.calls += 1
+            return ProbeResult(
+                success=True,
+                latency_ms=metadata.avg_latency_ms * 0.5,
+                cost=metadata.cost_per_call * 2.0,
+                output="ok",
+            )
+
+    backend = StubBackend()
+    registry, task = _demo_setup()
+    records = run_closed_loop(
+        registry=registry,
+        task=task,
+        synthesizer=BeamSynthesizer,
+        executor=AgentExecutor(backend=backend),  # backend decides success
+        iterations=2,
+        alpha=ALPHA,
+        candidates_per_iteration=2,
+    )
+
+    assert backend.calls == sum(r.trace_count for r in records) > 0
+    prior = registry.get("retrieval_speedster")
+    final = records[-1].registry.get("retrieval_speedster")
+    # measured at 0.5x latency -> calibrated moves below the prior;
+    # measured at 2x cost -> calibrated moves above the prior.
+    assert final.avg_latency_ms < prior.avg_latency_ms
+    assert final.cost_per_call > prior.cost_per_call
+    # exact closed form for two rounds: c1 = a*0.5p + (1-a)p,
+    # c2 = a*0.5*c1 + (1-a)*c1 = c1 * (1 - a/2)
+    c1 = ALPHA * 0.5 * prior.avg_latency_ms + (1 - ALPHA) * prior.avg_latency_ms
+    assert final.avg_latency_ms == pytest.approx(
+        c1 * (1 - ALPHA / 2), abs=1e-9
+    )
