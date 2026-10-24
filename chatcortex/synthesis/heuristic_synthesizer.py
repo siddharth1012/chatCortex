@@ -1,10 +1,9 @@
 from typing import List, Optional
 
-from chatcortex.graph.agent_graph import AgentGraph
 from chatcortex.optimization.architecture_candidate import ArchitectureCandidate
-from chatcortex.registry.metadata import ComponentMetadata
 from chatcortex.synthesis.base import Synthesizer
-from chatcortex.synthesis.budget import BudgetExceeded, SynthesisBudget, SynthesisContext
+from chatcortex.synthesis.budget import SynthesisBudget
+from chatcortex.synthesis.engine import ChainSearchEngine, score_component
 from chatcortex.synthesis.task_specification import TaskSpecification
 
 
@@ -12,28 +11,17 @@ class SynthesisError(Exception):
     pass
 
 
+def _violation_raises(constraint: str) -> None:
+    raise SynthesisError(f"Constructed agent exceeds {constraint} constraint")
+
+
 class HeuristicSynthesizer(Synthesizer):
     """
-    Deterministic greedy synthesizer
+    Deterministic greedy synthesizer (width-1 configuration of the engine)
 
-    v0.3.0:
-        - Budget-aware
-        - Returns ArchitectureCandidate
-        - Conforms to unified synthesis contract
-
-    Produces exactly one architecture (if feasible)
+    Builds the score-optimal single chain. Produces exactly one
+    architecture (if feasible) or raises SynthesisError.
     """
-
-    def _score(self, meta: ComponentMetadata, weights: dict) -> float:
-        """
-        Weighted scoring function - Lower is better
-        """
-
-        return (
-            weights["cost"] * meta.cost_per_call
-            + weights["latency"] * meta.avg_latency_ms
-            - weights["error"] * meta.reliability_score
-        )
 
     def synthesize(
         self,
@@ -42,69 +30,26 @@ class HeuristicSynthesizer(Synthesizer):
     ) -> List[ArchitectureCandidate]:
 
         task.validate()
-
-        context = SynthesisContext(budget)
-
-        graph = AgentGraph()
-        previous_node: Optional[str] = None
-
-        for idx, capability in enumerate(task.required_capabilities):
-
-            candidates = self.registry.get_by_capability(
+        for capability in task.required_capabilities:
+            if not self.registry.get_by_capability(
                 capability=capability,
-                privacy_constraint=task.privacy_constraint
-            )
-
-            if not candidates:
+                privacy_constraint=task.privacy_constraint,
+            ):
                 raise SynthesisError(
                     f"No Components available for capability '{capability}' under given constraints"
                 )
 
-            candidates_sorted = sorted(
-                candidates,
-                key=lambda candidate: self._score(candidate, task.objective_weights)
-            )
+        def truncate(expanded, stage_idx, keep_all):
+            # Greedy is single-output: the score-argmin is taken at every
+            # stage including the final one, so keep_all is ignored.
+            expanded.sort(key=lambda element: element[1])
+            return expanded[:1]
 
-            selected_candidate = candidates_sorted[0]
-            node_id = f"{selected_candidate.name}_{idx}"
-
-            graph.add_component(node_id, selected_candidate)
-
-            if previous_node:
-                graph.add_edge(previous_node, node_id)
-
-            previous_node = node_id
-
-        try:
-            context.register_evaluation()
-        except BudgetExceeded:
-            return []
-
-        # Compute metrics
-
-        total_cost = graph.total_cost()
-        total_latency = graph.total_latency()
-        total_reliability = graph.aggregate_reliability()
-
-        # Hard constraints
-
-        if task.max_cost is not None:
-            if graph.total_cost() > task.max_cost:
-                raise SynthesisError(
-                    "Constructed agent exceeds max_cost constraint"
-                )
-
-        if task.max_latency is not None:
-            if graph.total_latency() > task.max_latency:
-                raise SynthesisError(
-                    "Constructed agent exceeds max_latency constraint"
-                )
-
-        candidate = ArchitectureCandidate(
-            graph=graph,
-            total_cost=total_cost,
-            total_latency=total_latency,
-            total_reliability=total_reliability,
+        engine = ChainSearchEngine(self.registry)
+        return engine.run(
+            task,
+            budget,
+            scorer=score_component,
+            truncation=truncate,
+            on_violation=_violation_raises,
         )
-
-        return [candidate]

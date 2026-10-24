@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 
 import networkx as nx
 
@@ -73,6 +73,18 @@ class AgentGraph:
 
     def list_nodes(self) -> List[str]:
         return list(self._graph.nodes)
+
+    def edges(self) -> List[Tuple[str, str]]:
+        """All directed edges as public (from_node, to_node) tuples."""
+        return list(self._graph.edges)
+
+    def chain_append(self, node_id: str, metadata: ComponentMetadata) -> None:
+        """Add one component wired to the current chain end
+        (no edge for a first component); builds stage-anchored chains."""
+        nodes = list(self._graph.nodes)
+        self.add_component(node_id, metadata)
+        if nodes:
+            self.add_edge(nodes[-1], node_id)
 
     def iter_components(self):
         """Yield (node_id, metadata) pairs in execution order."""
